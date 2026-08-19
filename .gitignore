@@ -33,4 +33,6 @@ local_only/
 
 # Generated simulation outputs
 outputs/
-figures/
+figures/*
+!figures/commodity_simulation/
+!figures/commodity_simulation/*.png

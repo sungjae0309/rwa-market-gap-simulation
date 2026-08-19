@@ -8,6 +8,7 @@
 |---|---|
 | `data/commodity_simulation/` | 원자재 모델의 근거 수치와 가정값 |
 | `docs/` | 모델별 수식, 가정, 결과 해석 |
+| `figures/commodity_simulation/` | 노션·보고서용 원자재 결과 그래프 |
 | `rwa_market_gap/` | 실제 계산 로직 |
 | `scripts/` | 시뮬레이션 실행 진입점 |
 | `tests/` | 수식, 경계조건, 결과 일관성 검증 |
@@ -36,6 +37,7 @@
 - 테스트: `tests/commodity_simulation/`
 - 실행: `python3 -m scripts.run_commodity_simulation`
 - 민감도: `python3 -m scripts.run_commodity_sensitivity`
+- 그래프: `python3 -m scripts.plot_commodity_results`
 - 문서: [원자재 시뮬레이션](docs/commodity_simulation.md)
 
 두 모델 간 import 없는 독립 패키지
@@ -48,9 +50,9 @@ Python 3.10 이상, 외부 패키지 없이 실행 가능
 python3 -m unittest discover -s tests -v
 ```
 
-전체 테스트 93개 / 원자재 시나리오 전용 테스트 66개
+전체 테스트 99개 / 원자재 시나리오 전용 테스트 72개
 
-원자재 전용 66개 구성: 공시 파라미터 메커니즘 33개 / 스트레스 경제 모델 33개
+원자재 전용 72개 구성: 공시 파라미터 메커니즘 33개 / 스트레스 경제 모델 33개 / 시각화 수치 6개
 
 테스트 범위: 입력 수식과 경계조건의 코드 내 일관성 확인
 
