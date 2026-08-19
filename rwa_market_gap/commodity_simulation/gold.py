@@ -54,7 +54,8 @@ class GoldFalsificationResult:
     borrowed_usd: float
     collateral_oracle_value_usd: float
     collateral_tokens: float
-    observed_discount: float
+    tested_discount_assumption: float
+    tested_discount_source: str
     structural_zero_cost_break_even_discount: float
     modelled_break_even_discount: float
     reference_liquidity_utilization: float
@@ -67,7 +68,7 @@ class GoldFalsificationResult:
     uses_opposite_side_liquidity_proxy: bool
     liquidity_proxy_reason: str
     ledger: EconomicLedger
-    profitable_at_observed_discount: bool
+    profitable_at_tested_discount: bool
     success_probability: None = None
     probability_reason: str = (
         "The stale-oracle state is an explicit condition, not a calibrated random event."
@@ -110,12 +111,19 @@ class GoldFalsificationEconomics:
         prefix = "gold_collateral"
         ltv = float(self.evidence.value(f"{prefix}.max_ltv"))
         debt_cap = float(self.evidence.value(f"{prefix}.debt_cap_usd"))
-        observed_discount = float(
-            self.evidence.value(f"{prefix}.observed_max_token_discount")
+        uses_observed_divergence = token_discount is None
+        tested_discount = float(
+            self.evidence.value(f"{prefix}.observed_max_token_metal_divergence")
             if token_discount is None
             else token_discount
         )
-        rate(observed_discount, "token_discount")
+        rate(tested_discount, "token_discount")
+        tested_discount_source = (
+            "maximum observed token-to-metal divergence applied as an "
+            "attacker-favorable discount assumption"
+            if uses_observed_divergence
+            else "caller-supplied discount assumption"
+        )
         borrowed = min(self.assumptions.requested_borrow_usd, debt_cap)
         collateral_face = borrowed / ltv
 
@@ -141,7 +149,7 @@ class GoldFalsificationEconomics:
         terminal_impact = curve.terminal_impact(collateral_tokens)
         average_slippage = curve.average_slippage(collateral_tokens)
 
-        market_purchase_value = collateral_face * (1.0 - observed_discount)
+        market_purchase_value = collateral_face * (1.0 - tested_discount)
         slippage_cost = market_purchase_value * average_slippage
         fee = collateral_face * self.assumptions.acquisition_fee_rate
         interest = borrowed * self.assumptions.borrow_interest_rate_over_horizon
@@ -173,7 +181,8 @@ class GoldFalsificationEconomics:
             borrowed_usd=borrowed,
             collateral_oracle_value_usd=collateral_face,
             collateral_tokens=collateral_tokens,
-            observed_discount=observed_discount,
+            tested_discount_assumption=tested_discount,
+            tested_discount_source=tested_discount_source,
             structural_zero_cost_break_even_discount=1.0 - ltv,
             modelled_break_even_discount=break_even,
             reference_liquidity_utilization=(
@@ -194,5 +203,5 @@ class GoldFalsificationEconomics:
                 "acquisition cost; side symmetry is not established."
             ),
             ledger=ledger,
-            profitable_at_observed_discount=ledger.profitable,
+            profitable_at_tested_discount=ledger.profitable,
         )
