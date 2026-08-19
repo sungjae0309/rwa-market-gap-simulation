@@ -6,6 +6,7 @@
 |---|---|
 | `data/commodity_simulation/` | 원자재 모델의 근거 수치와 가정값 |
 | `docs/` | 모델별 수식, 가정, 결과 해석 |
+| `figures/commodity_simulation/` | 노션·보고서용 원자재 결과 그래프 영문·한글판 |
 | `rwa_market_gap/` | 실제 계산 로직 |
 | `scripts/` | 시뮬레이션 실행 진입점 |
 | `tests/` | 수식, 경계조건, 결과 일관성 검증 |
@@ -27,31 +28,37 @@
 
 ### 원자재 시나리오
 
-공시 파라미터 메커니즘(밴드 항등식, 리앵커 하드캡, 마진 구간)과 WTI·천연가스·토큰화 금의 CoC, PfC, 순이익, 손익분기 조건 계산
+공시 가격 밴드와 마진 구조를 재현하고 WTI·천연가스·토큰화 금의 공격 비용(CoC), 조건부 수익(PfC), 순이익, 손익분기 조건 계산
 
 - 코드: `rwa_market_gap/commodity_simulation/`
 - 입력: `data/commodity_simulation/`
 - 테스트: `tests/commodity_simulation/`
 - 실행: `python3 -m scripts.run_commodity_simulation`
 - 민감도: `python3 -m scripts.run_commodity_sensitivity`
+- 그래프: `python3 -m scripts.plot_commodity_results` 영문·한국어 PNG 각 3개 생성
 - 문서: [원자재 시뮬레이션](docs/commodity_simulation.md)
 
 두 모델 간 import 없는 독립 패키지
 
 ## 테스트
 
-Python 3.10 이상, 외부 패키지 없이 실행 가능
+핵심 모델과 테스트는 Python 3.10 이상에서 외부 패키지 없이 실행 가능
 
 ```bash
 python3 -m unittest discover -s tests -v
 ```
 
-전체 테스트 93개 / 원자재 시나리오 전용 테스트 66개
+전체 테스트 99개 / 원자재 시나리오 전용 테스트 72개
 
-원자재 전용 66개 구성: 공시 파라미터 메커니즘 33개 / 스트레스 경제 모델 33개
+원자재 전용 72개 구성: 공시 파라미터 메커니즘 33개 / 비용·수익 계산 33개 / 시각화 수치 6개
 
 테스트 범위: 입력 수식과 경계조건의 코드 내 일관성 확인
 
-한계: 실제 공격 성공 또는 확정 손실의 입증이 아닌 연구용 모델
+## 그래프 생성
 
-사용 제외: 실제 공격 또는 금융·투자 지침
+그래프 생성에만 Pillow 필요
+
+```bash
+python3 -m pip install -r requirements-visualization.txt
+python3 -m scripts.plot_commodity_results
+```
