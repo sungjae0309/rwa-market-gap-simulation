@@ -267,28 +267,14 @@ def _percentage(value: float) -> str:
     return f"{value:.1%}"
 
 
-def _ticks(start: float, stop: float, count: int) -> tuple[float, ...]:
-    return tuple(start + (stop - start) * index / (count - 1) for index in range(count))
-
-
-def _padded_domain(values: list[float], *, zero: bool = False) -> tuple[float, float]:
-    low = min(values)
-    high = max(values)
-    if zero:
-        low = min(low, 0.0)
-        high = max(high, 0.0)
-    span = max(high - low, 1.0)
-    return low - span * 0.10, high + span * 0.10
-
-
 def draw_wti_funding(
     data: WTIFundingChartData,
     destination: Path,
     *,
     korean: bool = False,
 ) -> None:
-    y_values = [point.y for series in data.series for point in series.points]
-    y_min, y_max = _padded_domain(y_values, zero=True)
+    y_min = -100_000.0
+    y_max = 150_000.0
     title = (
         "WTI: 펀딩비에 따른 순이익"
         if korean
@@ -324,8 +310,8 @@ def draw_wti_funding(
         fill=PALE_BLUE,
     )
     canvas.axes(
-        x_ticks=_ticks(data.x_min, data.x_max, 8),
-        y_ticks=_ticks(y_min, y_max, 7),
+        x_ticks=(0.0, 0.025, 0.05, 0.075, 0.10, 0.125),
+        y_ticks=(-100_000.0, -50_000.0, 0.0, 50_000.0, 100_000.0, 150_000.0),
         x_format=_percentage,
         y_format=_money,
     )
@@ -384,8 +370,9 @@ def draw_gold_discount(
     *,
     korean: bool = False,
 ) -> None:
-    y_values = [point.y for series in data.series for point in series.points]
-    y_min, y_max = _padded_domain(y_values, zero=True)
+    x_max = 0.40
+    y_min = -1_600_000.0
+    y_max = 400_000.0
     title = (
         "토큰화 금: 매입 할인 가정에 따른 순이익"
         if korean
@@ -409,14 +396,21 @@ def draw_gold_discount(
         ),
         y_label="순이익(달러)" if korean else "Net profit (USD)",
         x_min=data.x_min,
-        x_max=data.x_max,
+        x_max=x_max,
         y_min=y_min,
         y_max=y_max,
         korean=korean,
     )
     canvas.axes(
-        x_ticks=_ticks(data.x_min, data.x_max, 8),
-        y_ticks=_ticks(y_min, y_max, 7),
+        x_ticks=(0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40),
+        y_ticks=(
+            -1_600_000.0,
+            -1_200_000.0,
+            -800_000.0,
+            -400_000.0,
+            0.0,
+            400_000.0,
+        ),
         x_format=_percentage,
         y_format=_money,
     )
@@ -444,25 +438,24 @@ def draw_gold_discount(
             (pixel[0] - 8, pixel[1] - 8, pixel[0] + 8, pixel[1] + 8),
             fill=colors[index],
         )
-        canvas.draw.text(
-            (pixel[0], pixel[1] - 18 - index * 30),
-            (
-                f"손익분기 {break_even:.2%}"
-                if korean
-                else f"BE {break_even:.2%}"
-            ),
-            fill=FOREGROUND,
-            font=canvas.small_font,
-            anchor="ms",
-        )
     if korean:
-        legend_labels = ("가격 영향 완만", "가격 영향 기본", "가격 영향 가파름")
+        legend_labels = tuple(
+            f"{label} · 손익분기 {break_even:.2%}"
+            for label, break_even in zip(
+                ("가격 영향 완만", "가격 영향 기본", "가격 영향 가파름"),
+                data.break_even_discounts,
+            )
+        )
         canvas.legend(tuple(zip(legend_labels, colors)))
     else:
         canvas.legend(
             tuple(
-                (series.label, color)
-                for series, color in zip(data.series, colors)
+                (f"{series.label} · BE {break_even:.2%}", color)
+                for series, break_even, color in zip(
+                    data.series,
+                    data.break_even_discounts,
+                    colors,
+                )
             )
         )
     canvas.save(destination)
@@ -474,10 +467,7 @@ def draw_leverage_bands(
     *,
     korean: bool = False,
 ) -> None:
-    y_max = max(
-        max(bar.liquidation_adverse_move for bar in data.bars),
-        data.counterfactual_reanchor_cap_rate,
-    ) * 1.16
+    y_max = 0.20
     canvas = PlotCanvas(
         title=(
             "WTI: 레버리지별 청산 가격 변화폭"
@@ -500,7 +490,7 @@ def draw_leverage_bands(
     x_centers = tuple(index + 0.5 for index in range(len(data.bars)))
     canvas.axes(
         x_ticks=x_centers,
-        y_ticks=_ticks(0.0, y_max, 6),
+        y_ticks=(0.0, 0.05, 0.10, 0.15, 0.20),
         x_format=lambda value: f"{data.bars[int(value - 0.5)].leverage:g}x",
         y_format=_percentage,
     )
