@@ -1,0 +1,738 @@
+{
+  "schema_version": 1,
+  "ledger_as_of": "2026-08-14",
+  "mechanics": {
+    "reanchor_trigger_fraction": {
+      "value": 0.9,
+      "unit": "ratio of active band",
+      "definition": "Fraction of the active discovery bound that triggers a directional reference reset.",
+      "grade": "A",
+      "source": "trade.xyz commodity market mechanism documentation",
+      "as_of": "2026-08-14"
+    },
+    "protocol_update_clamp_rate": {
+      "value": 0.01,
+      "unit": "rate per update",
+      "definition": "Protocol-level mark-price change clamp per update.",
+      "grade": "A",
+      "source": "Hyperliquid protocol documentation",
+      "as_of": "2026-08-14"
+    },
+    "relayer_update_clamp_rate": {
+      "value": 0.005,
+      "unit": "rate per update",
+      "definition": "Relayer-level update clamp; this is the binding clamp when combined with the protocol clamp.",
+      "grade": "A",
+      "source": "trade.xyz mark-price documentation",
+      "as_of": "2026-08-14"
+    },
+    "maintenance_margin_fraction": {
+      "value": 0.5,
+      "unit": "ratio",
+      "definition": "Maintenance margin as a fraction of initial margin at the market maximum leverage, before unpublished margin tiers.",
+      "grade": "A",
+      "source": "Hyperliquid margining documentation",
+      "as_of": "2026-08-14"
+    }
+  },
+  "market_sessions": {
+    "standard_weekend_closure_hours": {
+      "value": 49,
+      "unit": "hours",
+      "definition": "Standard external-session closure from Friday 17:00 ET to Sunday 18:00 ET, excluding holidays.",
+      "grade": "A",
+      "source": "Published commodity market session specification",
+      "as_of": "2026-08-14"
+    }
+  },
+  "markets": {
+    "GOLD": {
+      "feed": {
+        "value": "Metal.XAU/USD",
+        "unit": "feed identifier",
+        "definition": "External reference feed used by the commodity perpetual market.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "max_leverage": {
+        "value": 25,
+        "unit": "multiple",
+        "definition": "Published maximum market leverage.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "band_rate": {
+        "value": 0.04,
+        "unit": "rate",
+        "definition": "Discovery bound around the active reference price.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "reset_limit": {
+        "value": 2,
+        "unit": "resets per direction",
+        "definition": "Independent upward and downward reanchor budget.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "margin_mode": {
+        "value": "cross",
+        "unit": "category",
+        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "grade": "A",
+        "source": "trade.xyz specification index and liquidation documentation",
+        "as_of": "2026-08-14"
+      },
+      "external_session": {
+        "value": "Sun 18:00 ET-Fri 17:00 ET",
+        "unit": "America/New_York session",
+        "definition": "Published external reference session; holiday calendars remain separate inputs.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      }
+    },
+    "WTIOIL": {
+      "feed": {
+        "value": "Commodities.WTIQ6/USD",
+        "unit": "feed identifier",
+        "definition": "External reference feed used by the commodity perpetual market.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "max_leverage": {
+        "value": 20,
+        "unit": "multiple",
+        "definition": "Published maximum market leverage.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "band_rate": {
+        "value": 0.05,
+        "unit": "rate",
+        "definition": "Discovery bound around the active reference price.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "reset_limit": {
+        "value": 2,
+        "unit": "resets per direction",
+        "definition": "Independent upward and downward reanchor budget.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "margin_mode": {
+        "value": "cross",
+        "unit": "category",
+        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "grade": "A",
+        "source": "trade.xyz specification index and liquidation documentation",
+        "as_of": "2026-08-14"
+      },
+      "external_session": {
+        "value": "Sun 18:00 ET-Fri 17:00 ET",
+        "unit": "America/New_York session",
+        "definition": "Published external reference session; holiday calendars remain separate inputs.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      }
+    },
+    "NATGAS": {
+      "feed": {
+        "value": "Commodities.NGDQ6/USD",
+        "unit": "feed identifier",
+        "definition": "Henry Hub futures reference feed used by the onchain market.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "max_leverage": {
+        "value": 10,
+        "unit": "multiple",
+        "definition": "Published maximum market leverage.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "band_rate": {
+        "value": 0.1,
+        "unit": "rate",
+        "definition": "Discovery bound around the active reference price.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "reset_limit": {
+        "value": 1,
+        "unit": "resets per direction",
+        "definition": "Independent upward and downward reanchor budget.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "margin_mode": {
+        "value": "isolated",
+        "unit": "category",
+        "definition": "Normal isolated margin; the cross-margin backstop liquidator does not apply.",
+        "grade": "A",
+        "source": "trade.xyz specification index and liquidation documentation",
+        "as_of": "2026-08-14"
+      },
+      "external_session": {
+        "value": "Sun 18:00 ET-Fri 17:00 ET",
+        "unit": "America/New_York session",
+        "definition": "Published external reference session; holiday calendars remain separate inputs.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      }
+    },
+    "SILVER": {
+      "feed": {
+        "value": "Metal.XAG/USD",
+        "unit": "feed identifier",
+        "definition": "External reference feed used by the commodity perpetual market.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "max_leverage": {
+        "value": 25,
+        "unit": "multiple",
+        "definition": "Published maximum market leverage.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "band_rate": {
+        "value": 0.04,
+        "unit": "rate",
+        "definition": "Discovery bound around the active reference price.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "reset_limit": {
+        "value": 2,
+        "unit": "resets per direction",
+        "definition": "Independent upward and downward reanchor budget.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "margin_mode": {
+        "value": "cross",
+        "unit": "category",
+        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "grade": "A",
+        "source": "trade.xyz specification index and liquidation documentation",
+        "as_of": "2026-08-14"
+      },
+      "external_session": {
+        "value": "Sun 18:00 ET-Fri 17:00 ET",
+        "unit": "America/New_York session",
+        "definition": "Published external reference session; holiday calendars remain separate inputs.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      }
+    },
+    "BRENTOIL": {
+      "feed": {
+        "value": "Commodities.BRENTU6/USD",
+        "unit": "feed identifier",
+        "definition": "External reference feed used by the commodity perpetual market.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "max_leverage": {
+        "value": 20,
+        "unit": "multiple",
+        "definition": "Published maximum market leverage.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "band_rate": {
+        "value": 0.05,
+        "unit": "rate",
+        "definition": "Discovery bound around the active reference price.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "reset_limit": {
+        "value": 2,
+        "unit": "resets per direction",
+        "definition": "Independent upward and downward reanchor budget.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      },
+      "margin_mode": {
+        "value": "cross",
+        "unit": "category",
+        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "grade": "A",
+        "source": "trade.xyz specification index and liquidation documentation",
+        "as_of": "2026-08-14"
+      },
+      "external_session": {
+        "value": "Sun 18:00 ET-Fri 18:00 ET",
+        "unit": "America/New_York session",
+        "definition": "Published external reference session; holiday calendars remain separate inputs.",
+        "grade": "A",
+        "source": "trade.xyz specification index",
+        "as_of": "2026-08-14"
+      }
+    }
+  },
+  "events": {
+    "wti_first_weekend": {
+      "friday_cme_close_usd": {
+        "value": 67.28,
+        "unit": "USD per barrel",
+        "definition": "Friday CME WTI close for the first supplied stress-weekend observation.",
+        "grade": "B",
+        "source": "Independent research event reconstruction supplied with the scenario",
+        "as_of": "2026-02-27"
+      },
+      "observed_onchain_mark_usd": {
+        "value": 70.64,
+        "unit": "USD per barrel",
+        "definition": "Last observed onchain WTI mark before the external session reopened in the first stress weekend.",
+        "grade": "B",
+        "source": "Independent research event reconstruction supplied with the scenario",
+        "as_of": "2026-03-01"
+      },
+      "cme_reopen_price_usd": {
+        "value": 75.0,
+        "unit": "USD per barrel",
+        "definition": "First reported CME WTI execution after the first supplied stress weekend.",
+        "grade": "B",
+        "source": "Independent research event reconstruction supplied with the scenario",
+        "as_of": "2026-03-01"
+      }
+    },
+    "wti_second_weekend": {
+      "friday_cme_close_usd": {
+        "value": 91.35,
+        "unit": "USD per barrel",
+        "definition": "Friday CME WTI close used as the event comparison base, not the venue-specific discovery-bound reference.",
+        "grade": "B",
+        "source": "Hyperliquid Research Collective and Blockworks Research event reconstruction",
+        "as_of": "2026-03-06"
+      },
+      "observed_onchain_mark_usd": {
+        "value": 95.833,
+        "unit": "USD per barrel",
+        "definition": "Last observed onchain WTI mark before the external session reopened.",
+        "grade": "B",
+        "source": "Hyperliquid Research Collective and Blockworks Research event reconstruction",
+        "as_of": "2026-03-08"
+      },
+      "cme_reopen_price_usd": {
+        "value": 106.89,
+        "unit": "USD per barrel",
+        "definition": "First reported CME CLJ6 execution after the weekend gap.",
+        "grade": "B",
+        "source": "Hyperliquid Research Collective and Blockworks Research event reconstruction",
+        "as_of": "2026-03-08"
+      },
+      "intraday_high_usd": {
+        "value": 114.77,
+        "unit": "USD per barrel",
+        "definition": "Subsequent reported intraday CL-USDC high.",
+        "grade": "B",
+        "source": "Multi-source liquidation event ledger",
+        "as_of": "2026-03-09"
+      },
+      "short_liquidations_usd": {
+        "value": 36900000,
+        "unit": "USD",
+        "definition": "Observed 24-hour short liquidations in the onchain oil contract.",
+        "grade": "B",
+        "source": "CoinDesk and Coinglass event ledger",
+        "as_of": "2026-03-09"
+      },
+      "long_liquidations_usd": {
+        "value": 2100000,
+        "unit": "USD",
+        "definition": "Observed 24-hour long liquidations in the onchain oil contract.",
+        "grade": "B",
+        "source": "CoinDesk and Coinglass event ledger",
+        "as_of": "2026-03-09"
+      },
+      "reanchor_active_during_event": {
+        "value": false,
+        "unit": "boolean",
+        "definition": "Whether the later reanchor mechanism was active during this event; false makes the v2 calculation counterfactual.",
+        "grade": "A",
+        "source": "trade.xyz mechanism changelog",
+        "as_of": "2026-03-13"
+      },
+      "adl_confirmed": {
+        "value": false,
+        "unit": "boolean evidence status",
+        "definition": "False means the supplied evidence does not confirm that ADL actually fired; it does not prove that ADL did not fire.",
+        "grade": "B",
+        "source": "Supplied multi-source liquidation ledger and unresolved-items register",
+        "as_of": "2026-08-14"
+      }
+    },
+    "natural_gas_benchmark_gap": {
+      "jkm_change": {
+        "value": 0.828,
+        "unit": "rate over stated event window",
+        "definition": "Change in the Asian LNG benchmark after the late-February event onset.",
+        "grade": "B",
+        "source": "Rystad Energy via American Gas Association",
+        "as_of": "2026-04-13"
+      },
+      "ttf_change": {
+        "value": 0.481,
+        "unit": "rate over stated event window",
+        "definition": "Change in the European gas benchmark over the same stated event window.",
+        "grade": "B",
+        "source": "Rystad Energy via American Gas Association",
+        "as_of": "2026-04-13"
+      },
+      "henry_hub_change": {
+        "value": -0.091,
+        "unit": "rate over stated event window",
+        "definition": "Change in the US Henry Hub benchmark referenced by the onchain natural-gas market.",
+        "grade": "B",
+        "source": "Rystad Energy via American Gas Association",
+        "as_of": "2026-04-13"
+      }
+    }
+  },
+  "market_studies": {
+    "weekend_direction_match_rate": {
+      "value": 0.899,
+      "unit": "share of observations",
+      "definition": "Share of supplied symbol-weekend observations where the onchain implied move and external reopen move had the same direction.",
+      "grade": "B",
+      "source": "Independent research study of 199 symbol-weekend observations supplied with the scenario",
+      "as_of": "2026-04-06"
+    },
+    "weekend_onchain_closer_to_reopen_rate": {
+      "value": 0.784,
+      "unit": "share of observations",
+      "definition": "Share of supplied observations where the onchain weekend price was closer to the reopen price than to the Friday close.",
+      "grade": "B",
+      "source": "Independent research study of 199 symbol-weekend observations supplied with the scenario",
+      "as_of": "2026-04-06"
+    }
+  },
+  "gold_collateral": {
+    "max_ltv": {
+      "value": 0.7,
+      "unit": "rate",
+      "definition": "Collateral maximum loan-to-value ratio in the listing snapshot.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "liquidation_threshold": {
+      "value": 0.75,
+      "unit": "rate",
+      "definition": "Collateral liquidation threshold in the listing snapshot.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "liquidation_bonus": {
+      "value": 0.06,
+      "unit": "rate",
+      "definition": "Gross liquidation bonus before token discount, slippage, inventory risk, and execution costs.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "liquidation_protocol_fee": {
+      "value": 0.1,
+      "unit": "share of liquidation bonus",
+      "definition": "Protocol share of the liquidation incentive in the listing snapshot.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "supply_cap_tokens": {
+      "value": 5000,
+      "unit": "tokens",
+      "definition": "Collateral supply cap in the listing snapshot.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "debt_cap_usd": {
+      "value": 3000000,
+      "unit": "USD",
+      "definition": "Debt ceiling in the listing snapshot.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    },
+    "reference_token_price_usd": {
+      "value": 4354,
+      "unit": "USD per token-ounce",
+      "definition": "Reference price used only to translate the token supply cap into USD for the documented scale comparison.",
+      "grade": "B",
+      "source": "Supplied market-price ledger",
+      "as_of": "2026-08-13"
+    },
+    "disposal_capacity_within_bonus_usd": {
+      "value": 9440000,
+      "unit": "USD",
+      "definition": "Measured disposal capacity before estimated price impact exceeds six percent.",
+      "grade": "B",
+      "source": "Risk-provider liquidity assessment in the governance record",
+      "as_of": "2025-06"
+    },
+    "disposal_capacity_within_bonus_tokens": {
+      "value": 2800,
+      "unit": "tokens",
+      "definition": "Token amount corresponding to the measured disposal capacity within six-percent price impact.",
+      "grade": "B",
+      "source": "Risk-provider liquidity assessment in the governance record",
+      "as_of": "2025-06"
+    },
+    "disposal_capacity_average_price_impact_bound": {
+      "value": 0.06,
+      "unit": "rate",
+      "definition": "Reported average swap price-impact boundary at the disposal-capacity observation. Numerically equal to the liquidation bonus but conceptually distinct. The source does not establish buy-side depth or terminal marginal impact.",
+      "grade": "B",
+      "source": "Risk-provider liquidity assessment in the governance record",
+      "as_of": "2025-06"
+    },
+    "observed_max_token_discount": {
+      "value": 0.045,
+      "unit": "rate",
+      "definition": "Largest token-to-metal divergence in the broader supplied observation window.",
+      "grade": "B",
+      "source": "Risk-provider market-divergence assessment in the governance record",
+      "as_of": "2025-06"
+    },
+    "secondary_holder_can_redeem": {
+      "value": false,
+      "unit": "boolean",
+      "definition": "Whether a secondary-market holder can directly redeem or obtain physical delivery from the issuer.",
+      "grade": "A",
+      "source": "Issuer terms quoted in the collateral governance review",
+      "as_of": "2025-08-25"
+    },
+    "borrowing_token_itself_enabled": {
+      "value": false,
+      "unit": "boolean",
+      "definition": "Whether the tokenized-gold asset itself was enabled as a borrowable asset; it remained usable as collateral.",
+      "grade": "A",
+      "source": "Tokenized-gold collateral listing governance proposal",
+      "as_of": "2025-08-25"
+    }
+  },
+  "analysis": {
+    "loss_transfer_notional_usd": {
+      "value": 20000000,
+      "unit": "USD notional",
+      "definition": "Common notional used only for cross-market loss-transfer sensitivity comparison.",
+      "grade": "C",
+      "source": "Supplied validation protocol comparison convention",
+      "as_of": "2026-08-14",
+      "label": "assumption",
+      "sensitivity": [1000000, 20000000]
+    },
+    "loss_transfer_chosen_leverage": {
+      "value": 20,
+      "unit": "multiple",
+      "definition": "WTI maximum-leverage case used for the limited-liability comparison.",
+      "grade": "C",
+      "source": "Supplied validation protocol comparison convention",
+      "as_of": "2026-08-14",
+      "label": "assumption",
+      "sensitivity": [5, 20]
+    },
+    "benchmark_exposure_notional_usd": {
+      "value": 1000000,
+      "unit": "USD notional",
+      "definition": "Illustrative exposure used to translate benchmark tracking error into dollars; it is not an observed position.",
+      "grade": "C",
+      "source": "Simulation convention",
+      "as_of": "2026-08-14",
+      "label": "assumption",
+      "sensitivity": [100000, 10000000]
+    }
+  },
+  "attack_economics": {
+    "wti": {
+      "position_notional_usd": {
+        "value": 1000000,
+        "unit": "USD notional",
+        "definition": "Illustrative strategic position size; it is not an observed attacker position.",
+        "grade": "C",
+        "source": "Simulation convention",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [100000, 5000000]
+      },
+      "chosen_leverage": {
+        "value": 10,
+        "unit": "multiple",
+        "definition": "Illustrative WTI position leverage, bounded by the published market maximum.",
+        "grade": "C",
+        "source": "Simulation convention",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [5, 20]
+      },
+      "horizon_hours": {
+        "value": 49,
+        "unit": "hours",
+        "definition": "Standard external-session closure from Friday 17:00 ET to Sunday 18:00 ET, excluding holidays.",
+        "grade": "A",
+        "source": "Published commodity market session specification",
+        "as_of": "2026-08-14"
+      },
+      "round_trip_fee_rate": {
+        "value": 0.001,
+        "unit": "rate of notional",
+        "definition": "Combined entry and exit trading fees used for attack-profit sensitivity; venue and account tiers are not reconstructed.",
+        "grade": "C",
+        "source": "Simulation assumption pending account-level fee evidence",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0002, 0.003]
+      },
+      "round_trip_slippage_rate": {
+        "value": 0.001,
+        "unit": "rate of notional",
+        "definition": "Combined entry and exit slippage; its range is informed by the supplied weekend spread distribution but is not a reconstructed order book.",
+        "grade": "C",
+        "source": "Simulation assumption informed by supplied weekend market-quality observations",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.00025, 0.00409]
+      },
+      "funding_rate_over_horizon": {
+        "value": 0.0005,
+        "unit": "rate of notional over 49 hours",
+        "definition": "Absolute funding cost over the modelled holding window; negative funding benefits are not credited.",
+        "grade": "C",
+        "source": "Simulation assumption pending venue-level funding history",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 0.005]
+      },
+      "capital_annual_rate": {
+        "value": 0.05,
+        "unit": "annual rate",
+        "definition": "Opportunity cost applied to posted initial margin over the holding window.",
+        "grade": "C",
+        "source": "Simulation assumption",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 0.15]
+      },
+      "deployment_bond_value_usd": {
+        "value": 27300000,
+        "unit": "USD",
+        "definition": "Approximate value of the published 500,000-token deployment stake at the supplied observation date.",
+        "grade": "B",
+        "source": "Published stake requirement combined with supplied dated token valuation",
+        "as_of": "2026-08-11"
+      },
+      "attacker_self_bond_fraction": {
+        "value": 0.1,
+        "unit": "share of deployment bond",
+        "definition": "Share of the deployment bond economically owned by a hypothetical parameter-setting attacker rather than outside funders.",
+        "grade": "C",
+        "source": "Simulation assumption; no deployer-specific capital stack was supplied",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 1.0]
+      },
+      "slashing_probability": {
+        "value": 0.02,
+        "unit": "probability per simulated attempt",
+        "definition": "Conditional probability that the modelled deployer conduct leads to slashing; user trading losses alone are not treated as proof of slashability.",
+        "grade": "C",
+        "source": "Simulation assumption pending adjudication history",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 0.25]
+      },
+      "slashing_fraction": {
+        "value": 1.0,
+        "unit": "share of self-funded bond",
+        "definition": "Loss fraction applied to the attacker's own bond when a slashing event occurs.",
+        "grade": "C",
+        "source": "Conservative simulation assumption",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 1.0]
+      }
+    },
+    "gold": {
+      "token_discount_rate": {
+        "value": 0.005,
+        "unit": "discount to metal-oracle value",
+        "definition": "Triangular distribution mode for purchasing tokenized gold below the static metal-oracle value; the high end is the supplied observed maximum.",
+        "grade": "C",
+        "source": "Simulation assumption bounded by the supplied market-divergence assessment",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 0.045]
+      },
+      "acquisition_execution_rate": {
+        "value": 0.005,
+        "unit": "rate of collateral oracle value",
+        "definition": "One-way fee and slippage cost to acquire collateral; it is varied up to the documented six-percent liquidity-impact boundary.",
+        "grade": "C",
+        "source": "Simulation assumption bounded by the collateral liquidity assessment",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.001, 0.06]
+      },
+      "borrow_interest_rate_over_horizon": {
+        "value": 0.0003,
+        "unit": "rate of borrowed amount over 49 hours",
+        "definition": "Borrow interest accrued before exit or strategic default over the standard weekend window.",
+        "grade": "C",
+        "source": "Simulation assumption pending reserve-level rate history",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.0, 0.003]
+      },
+      "oracle_stale_probability": {
+        "value": 0.95,
+        "unit": "conditional probability",
+        "definition": "Probability that the static metal-oracle valuation remains usable long enough to complete the modelled borrow after the discount is observed.",
+        "grade": "C",
+        "source": "Simulation assumption; no transaction-level execution sample was supplied",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [0.5, 1.0]
+      },
+      "gas_and_operations_usd": {
+        "value": 1000,
+        "unit": "USD per attempt",
+        "definition": "Fixed gas and operational overhead for the collateral acquisition, deposit, and borrow sequence.",
+        "grade": "C",
+        "source": "Simulation assumption",
+        "as_of": "2026-08-15",
+        "label": "assumption",
+        "sensitivity": [100, 10000]
+      }
+    }
+  }
+}

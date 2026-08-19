@@ -1,7 +1,7 @@
 """Configuration for the protocol-aware Weekend Gap research model.
 
 This module intentionally lives beside, rather than replaces,
-``weekend_gap_config.WeekendGapConfig``. Its defaults are conservative and
+``rwa_market_gap.weekend_gap.config.WeekendGapConfig``. Its defaults are conservative and
 unverified: a closed-market loan is blocked until the researcher explicitly
 supplies the target protocol's oracle policy and enables that path.
 """
