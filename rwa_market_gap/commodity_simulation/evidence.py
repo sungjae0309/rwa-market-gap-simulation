@@ -1,4 +1,4 @@
-"""Evidence-aware input loading for the commodity oracle models.
+"""Evidence-aware input loading for the commodity simulation.
 
 The simulation consumes values from one JSON ledger. Every numeric, boolean,
 or categorical input used by a scenario carries a unit, definition, evidence
@@ -18,8 +18,8 @@ EvidenceGrade = Literal["A", "B", "C", "X"]
 DEFAULT_LEDGER_PATH = (
     Path(__file__).resolve().parents[2]
     / "data"
-    / "commodity_oracle"
-    / "verified_inputs.json"
+    / "commodity_simulation"
+    / "evidence.json"
 )
 
 

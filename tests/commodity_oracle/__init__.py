@@ -1,1 +1,0 @@
-"""Commodity-oracle model tests."""

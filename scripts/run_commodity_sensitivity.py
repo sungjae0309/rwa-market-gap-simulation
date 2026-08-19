@@ -1,13 +1,13 @@
-"""Print one-at-a-time sensitivity ranges for every reviewed assumption."""
+"""Print one-at-a-time sensitivity ranges for every model assumption."""
 
 from __future__ import annotations
 
 from collections import defaultdict
 
-from rwa_market_gap.reviewed_commodity_economics import (
-    ReviewedCommodityEconomicsEngine,
+from rwa_market_gap.commodity_simulation import (
+    CommoditySimulationEngine,
 )
-from rwa_market_gap.reviewed_commodity_economics.sensitivity import (
+from rwa_market_gap.commodity_simulation.sensitivity import (
     SensitivityPoint,
     gold_one_at_a_time,
     wti_one_at_a_time,
@@ -34,7 +34,7 @@ def print_ranges(points: tuple[SensitivityPoint, ...]) -> None:
 
 
 def main() -> None:
-    engine = ReviewedCommodityEconomicsEngine()
+    engine = CommoditySimulationEngine()
     suite = engine.build()
     print("WTI one-at-a-time sensitivity")
     print_ranges(wti_one_at_a_time(suite.wti, engine.assumptions))

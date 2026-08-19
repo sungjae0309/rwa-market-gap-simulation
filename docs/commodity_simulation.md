@@ -1,14 +1,14 @@
-# 검토 반영 원자재 스트레스 경제 모델
+# 원자재 시나리오 시뮬레이션
 
-이 패키지는 초기 공격경제 모델을 덮어쓰지 않고 별도 경로에 다시 구현한 검토 반영본입니다.
+이 패키지는 WTI·토큰화 금·천연가스 시나리오의 경제적 조건을 검증하는 공개 모델입니다.
 
 ```text
-rwa_market_gap/reviewed_commodity_economics/
-data/reviewed_commodity_economics/assumptions.json
-tests/reviewed_commodity_economics/
+rwa_market_gap/commodity_simulation/
+data/commodity_simulation/
+tests/commodity_simulation/
 ```
 
-초기 모델은 재현과 비교를 위해 `commodity_oracle/attack_scenarios.py`에 보존하지만, 공격 성공확률이나 배포자 공격 결과를 연구 결론으로 사용하지 않습니다.
+검증되지 않은 공격 성공확률이나 배포자 공격 결과는 공개 모델에 포함하지 않습니다.
 
 ## 달라진 원칙
 
@@ -56,7 +56,7 @@ WTI 결과는 공격 성공률이 아니라 다음 조건의 **사후 전략 손
 ```text
 순이익(f) = 실현이익 - 수수료 - 슬리피지 - 자본비용 - 명목 × f
 
-f* = (실현이익 - 실현손실 - 수수료 - 슬리피지 - 자본비용) / 명목
+f* = (실현이익 - 수수료 - 슬리피지 - 자본비용) / 명목
 ```
 
 `f*`는 고정 명목·고정 보유기간·중간 청산 없음이라는 조건에서의 폐형식 해이며, 가정한 펀딩률과 무관하게 같은 값이 나옵니다. 음수면 펀딩을 **수취**해야만 손익분기에 도달한다는 뜻입니다.
@@ -123,7 +123,7 @@ attack_success_probability=None
 모든 신규 C등급 가정은 저·기본·고의 일변량 민감도를 가집니다.
 
 ```bash
-python3 -m scripts.run_reviewed_sensitivity
+python3 -m scripts.run_commodity_sensitivity
 ```
 
 이는 변수 간 상관관계를 포함한 확률분포가 아니라, 어떤 가정이 결론을 뒤집는지 찾는 결정론적 점검입니다.
@@ -145,8 +145,8 @@ wti.slippage_exponent: net $112,849.82..$112,849.82
 ## 실행
 
 ```bash
-python3 -m scripts.run_reviewed_commodity_economics
-python3 -m scripts.run_reviewed_sensitivity
+python3 -m scripts.run_commodity_simulation
+python3 -m scripts.run_commodity_sensitivity
 python3 -m unittest discover -s tests -v
 ```
 

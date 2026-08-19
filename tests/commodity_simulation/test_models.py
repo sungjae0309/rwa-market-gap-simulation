@@ -6,41 +6,41 @@ from datetime import date
 from math import nan
 import unittest
 
-from rwa_market_gap.commodity_oracle.evidence import VerifiedInputLedger
-from rwa_market_gap.reviewed_commodity_economics import (
-    ReviewedCommodityEconomicsEngine,
+from rwa_market_gap.commodity_simulation.evidence import VerifiedInputLedger
+from rwa_market_gap.commodity_simulation import (
+    CommoditySimulationEngine,
 )
-from rwa_market_gap.reviewed_commodity_economics.common import (
+from rwa_market_gap.commodity_simulation.common import (
     EconomicLedger,
     UnsupportedModel,
 )
-from rwa_market_gap.reviewed_commodity_economics.execution import (
+from rwa_market_gap.commodity_simulation.execution import (
     PowerLawAverageImpactCurve,
 )
-from rwa_market_gap.reviewed_commodity_economics.gold import (
+from rwa_market_gap.commodity_simulation.gold import (
     GoldFalsificationResult,
 )
-from rwa_market_gap.reviewed_commodity_economics.natural_gas import (
+from rwa_market_gap.commodity_simulation.natural_gas import (
     NaturalGasEvidenceReview,
 )
-from rwa_market_gap.reviewed_commodity_economics.oracle_math import (
+from rwa_market_gap.commodity_simulation.oracle_math import (
     minimum_compounded_updates,
 )
-from rwa_market_gap.reviewed_commodity_economics.sensitivity import (
+from rwa_market_gap.commodity_simulation.sensitivity import (
     GOLD_ASSUMPTION_MAP,
     WTI_ASSUMPTION_MAP,
     gold_one_at_a_time,
     wti_one_at_a_time,
 )
-from rwa_market_gap.reviewed_commodity_economics.wti import (
+from rwa_market_gap.commodity_simulation.wti import (
     WTIStressAssumptions,
     WTIStressEconomics,
 )
 
 
-class ReviewedWTITests(unittest.TestCase):
+class CommodityWTITests(unittest.TestCase):
     def setUp(self) -> None:
-        self.suite = ReviewedCommodityEconomicsEngine().build()
+        self.suite = CommoditySimulationEngine().build()
 
     def test_observed_returns_use_entry_mark_denominator(self) -> None:
         first, second = self.suite.wti.analyze_all()
@@ -196,7 +196,7 @@ class ReviewedWTITests(unittest.TestCase):
         # The research finding: the assumption interval cannot reach the level
         # that would neutralise the observed state, so the sweep alone can never
         # overturn the conclusion.
-        engine = ReviewedCommodityEconomicsEngine()
+        engine = CommoditySimulationEngine()
         _, ceiling = engine.assumptions.record(
             "wti.signed_funding_rate_over_horizon"
         ).sensitivity
@@ -221,9 +221,9 @@ class ReviewedWTITests(unittest.TestCase):
             )
 
 
-class ReviewedGoldTests(unittest.TestCase):
+class CommodityGoldTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.gold = ReviewedCommodityEconomicsEngine().build().gold
+        self.gold = CommoditySimulationEngine().build().gold
 
     def test_zero_cost_structural_break_even_is_one_minus_ltv(self) -> None:
         result = self.gold.analyze()
@@ -291,9 +291,9 @@ class ReviewedGoldTests(unittest.TestCase):
         self.assertIsNone(result.success_probability)
 
 
-class ReviewedNaturalGasTests(unittest.TestCase):
+class CommodityNaturalGasTests(unittest.TestCase):
     def setUp(self) -> None:
-        self.gas = ReviewedCommodityEconomicsEngine().build().natural_gas
+        self.gas = CommoditySimulationEngine().build().natural_gas
 
     def test_missing_event_window_blocks_dollar_loss(self) -> None:
         result = self.gas.analyze()
@@ -306,7 +306,7 @@ class ReviewedNaturalGasTests(unittest.TestCase):
             self.gas.analyze(exposure_notional_usd=1_000_000)
 
     def test_explicit_aligned_window_allows_illustrative_error(self) -> None:
-        engine = ReviewedCommodityEconomicsEngine()
+        engine = CommoditySimulationEngine()
         payload = deepcopy(engine.evidence.payload)
         event = payload["events"]["natural_gas_benchmark_gap"]
         event["event_window_start"] = {
@@ -344,7 +344,7 @@ class ReviewedNaturalGasTests(unittest.TestCase):
             )
 
 
-class ReviewedMathAndAccountingTests(unittest.TestCase):
+class CommodityMathAndAccountingTests(unittest.TestCase):
     def test_compounded_clamp_requires_23_not_25_updates(self) -> None:
         self.assertEqual(minimum_compounded_updates(1.0, 1.12104, 0.005), 23)
 
@@ -352,8 +352,8 @@ class ReviewedMathAndAccountingTests(unittest.TestCase):
         ledger = EconomicLedger(pfc_usd=100.0, coc_usd=30.0, capital_at_risk_usd=50.0)
         self.assertEqual(ledger.net_profit_usd, 70.0)
 
-    def test_every_reviewed_assumption_has_a_sensitivity_sweep(self) -> None:
-        engine = ReviewedCommodityEconomicsEngine()
+    def test_every_assumption_has_a_sensitivity_sweep(self) -> None:
+        engine = CommoditySimulationEngine()
         suite = engine.build()
         paths = {record.path for record in engine.assumptions.records}
         self.assertEqual(paths, set(WTI_ASSUMPTION_MAP) | set(GOLD_ASSUMPTION_MAP))
@@ -367,7 +367,7 @@ class ReviewedMathAndAccountingTests(unittest.TestCase):
         )
 
 
-class ReviewedProvenanceAndSweepTests(unittest.TestCase):
+class CommodityProvenanceAndSweepTests(unittest.TestCase):
     """R-5 of the verification protocol: no hardcoded economic parameters."""
 
     def test_horizon_hours_has_no_code_side_default(self) -> None:
@@ -378,7 +378,7 @@ class ReviewedProvenanceAndSweepTests(unittest.TestCase):
         self.assertIs(field.default_factory, MISSING)
 
     def test_horizon_hours_is_read_from_grade_a_evidence(self) -> None:
-        engine = ReviewedCommodityEconomicsEngine()
+        engine = CommoditySimulationEngine()
         record = engine.evidence.record(
             "market_sessions.standard_weekend_closure_hours"
         )
@@ -388,7 +388,7 @@ class ReviewedProvenanceAndSweepTests(unittest.TestCase):
         )
 
     def test_gold_impact_reference_is_read_from_the_ledger(self) -> None:
-        engine = ReviewedCommodityEconomicsEngine()
+        engine = CommoditySimulationEngine()
         record = engine.evidence.record(
             "gold_collateral.disposal_capacity_average_price_impact_bound"
         )
@@ -400,7 +400,7 @@ class ReviewedProvenanceAndSweepTests(unittest.TestCase):
         payload["gold_collateral"][
             "disposal_capacity_average_price_impact_bound"
         ]["value"] = 2.0 * float(record.value)
-        doubled = ReviewedCommodityEconomicsEngine(
+        doubled = CommoditySimulationEngine(
             evidence=VerifiedInputLedger(
                 payload, source_path=engine.evidence.source_path
             )
@@ -414,7 +414,7 @@ class ReviewedProvenanceAndSweepTests(unittest.TestCase):
     def test_flat_sweep_rows_always_carry_an_explanation(self) -> None:
         # A flat row with no reason would read as "this assumption is
         # irrelevant", which is a different claim from "inactive here".
-        engine = ReviewedCommodityEconomicsEngine()
+        engine = CommoditySimulationEngine()
         suite = engine.build()
         grouped: dict[str, list] = {}
         for point in wti_one_at_a_time(suite.wti, engine.assumptions):
@@ -434,7 +434,7 @@ class ReviewedProvenanceAndSweepTests(unittest.TestCase):
     def test_slippage_exponent_is_active_below_capacity(self) -> None:
         # Proves the flat sweep row is a property of the configuration, not of
         # the parameter.
-        suite = ReviewedCommodityEconomicsEngine().build()
+        suite = CommoditySimulationEngine().build()
         half = replace(suite.wti.assumptions, requested_notional_usd=500_000)
         shallow = WTIStressEconomics(
             suite.wti.evidence, replace(half, slippage_exponent=0.5)

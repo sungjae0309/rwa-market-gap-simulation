@@ -1,4 +1,4 @@
-"""Shared, finite-only accounting types for the reviewed commodity models."""
+"""Shared, finite-only accounting types for the commodity simulation."""
 
 from __future__ import annotations
 

@@ -5,9 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 
-from rwa_market_gap.commodity_oracle.evidence import VerifiedInputLedger
-
 from .common import finite, non_negative
+from .evidence import VerifiedInputLedger
 
 
 @dataclass(frozen=True)

@@ -1,4 +1,4 @@
-"""Reviewed oracle-clamp arithmetic using multiplicative updates."""
+"""Oracle-clamp arithmetic using multiplicative updates."""
 
 from __future__ import annotations
 

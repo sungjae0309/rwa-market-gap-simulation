@@ -1,13 +1,12 @@
-"""Reviewed WTI stress-event economics without a fabricated success probability."""
+"""WTI stress-event economics without a fabricated success probability."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
 from math import isclose
 
-from rwa_market_gap.commodity_oracle.evidence import VerifiedInputLedger
-
 from .common import EconomicLedger, UnsupportedModel, finite, non_negative, rate
+from .evidence import VerifiedInputLedger
 from .execution import CapacityResult, apply_capacity
 
 
@@ -203,7 +202,7 @@ class WTIStressEconomics:
             return UnsupportedModel(
                 name=f"{event} WTI adverse execution path",
                 reason=(
-                    "The supplied reviewed model has no event order book or "
+                    "The supplied model has no event order book or "
                     "liquidation timeline. It therefore does not fabricate a "
                     "threshold fill, backstop loss, or ADL outcome."
                 ),
