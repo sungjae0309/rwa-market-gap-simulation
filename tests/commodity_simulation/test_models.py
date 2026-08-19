@@ -231,13 +231,15 @@ class CommodityGoldTests(unittest.TestCase):
         assert isinstance(result, GoldFalsificationResult)
         self.assertAlmostEqual(result.structural_zero_cost_break_even_discount, 0.30)
 
-    def test_observed_discount_is_unprofitable_for_all_curve_shapes(self) -> None:
+    def test_observed_divergence_used_as_discount_is_unprofitable(self) -> None:
         for exponent in (0.5, 1.0, 2.0):
             result = self.gold.with_impact_exponent(exponent).analyze()
             assert isinstance(result, GoldFalsificationResult)
-            self.assertFalse(result.profitable_at_observed_discount)
+            self.assertFalse(result.profitable_at_tested_discount)
+            self.assertIn("discount assumption", result.tested_discount_source)
             self.assertGreater(
-                result.modelled_break_even_discount, result.observed_discount
+                result.modelled_break_even_discount,
+                result.tested_discount_assumption,
             )
 
     def test_market_impact_depends_on_position_size(self) -> None:

@@ -336,7 +336,15 @@
       "observed_onchain_mark_usd": {
         "value": 95.833,
         "unit": "USD per barrel",
-        "definition": "Last observed onchain WTI mark before the external session reopened.",
+        "definition": "Last observed onchain WTI mark before the external session reopened; the supplied report describes it as the venue-specific five-percent static upper bound.",
+        "grade": "B",
+        "source": "Hyperliquid Research Collective and Blockworks Research event reconstruction",
+        "as_of": "2026-03-08"
+      },
+      "observed_onchain_mark_is_static_upper_bound": {
+        "value": true,
+        "unit": "boolean evidence status",
+        "definition": "Whether the supplied report identifies the observed onchain mark as the venue-specific static upper bound, allowing the venue reference to be inferred without substituting the CME close.",
         "grade": "B",
         "source": "Hyperliquid Research Collective and Blockworks Research event reconstruction",
         "as_of": "2026-03-08"
@@ -516,10 +524,10 @@
       "source": "Risk-provider liquidity assessment in the governance record",
       "as_of": "2025-06"
     },
-    "observed_max_token_discount": {
+    "observed_max_token_metal_divergence": {
       "value": 0.045,
       "unit": "rate",
-      "definition": "Largest token-to-metal divergence in the broader supplied observation window.",
+      "definition": "Largest observed token-to-metal divergence in the broader supplied observation window. This is not itself a verified acquisition discount.",
       "grade": "B",
       "source": "Risk-provider market-divergence assessment in the governance record",
       "as_of": "2025-06"
