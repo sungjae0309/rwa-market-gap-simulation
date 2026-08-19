@@ -1,11 +1,10 @@
-"""One-at-a-time sensitivity sweeps for every reviewed C-grade assumption."""
+"""One-at-a-time sensitivity sweeps for every C-grade assumption."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
-from rwa_market_gap.commodity_oracle.evidence import EvidenceRecord, VerifiedInputLedger
-
+from .evidence import EvidenceRecord, VerifiedInputLedger
 from .gold import GoldFalsificationEconomics, GoldFalsificationResult
 from .wti import WTIStressEconomics
 

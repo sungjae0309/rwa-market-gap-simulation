@@ -1,14 +1,14 @@
-"""Run the reviewed, non-probabilistic commodity economics package."""
+"""Run the public, non-probabilistic commodity simulation."""
 
 from __future__ import annotations
 
-from rwa_market_gap.reviewed_commodity_economics import (
-    ReviewedCommodityEconomicsEngine,
+from rwa_market_gap.commodity_simulation import (
+    CommoditySimulationEngine,
 )
-from rwa_market_gap.reviewed_commodity_economics.gold import (
+from rwa_market_gap.commodity_simulation.gold import (
     GoldFalsificationResult,
 )
-from rwa_market_gap.reviewed_commodity_economics.oracle_math import (
+from rwa_market_gap.commodity_simulation.oracle_math import (
     minimum_compounded_updates,
 )
 
@@ -18,7 +18,7 @@ def usd(value: float) -> str:
 
 
 def main() -> None:
-    suite = ReviewedCommodityEconomicsEngine().build()
+    suite = CommoditySimulationEngine().build()
 
     print("WTI observed stress states (not attack probabilities)")
     for result in suite.wti.analyze_all():

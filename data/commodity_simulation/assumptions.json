@@ -6,7 +6,7 @@
       "unit": "USD notional",
       "definition": "Requested stress-position size; the executable amount is separately capacity-capped.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [100000, 10000000]
@@ -16,7 +16,7 @@
       "unit": "USD notional",
       "definition": "Unverified maximum executable notional used only to demonstrate capacity constraints; it is not claimed as observed market depth.",
       "grade": "C",
-      "source": "Reviewed-model placeholder pending event order-book data",
+      "source": "Commodity-simulation placeholder pending event order-book data",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [100000, 5000000]
@@ -26,7 +26,7 @@
       "unit": "USD",
       "definition": "Capital allocated to support the modelled WTI position. This is not a reconstruction of a full cross-margin account.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [50000, 500000]
@@ -36,7 +36,7 @@
       "unit": "rate of executable notional",
       "definition": "Combined entry and exit fees; an account-level fee history was not supplied.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.0002, 0.003]
@@ -46,7 +46,7 @@
       "unit": "rate of executable notional",
       "definition": "Combined entry and exit average slippage at the assumed capacity reference point; smaller executions scale by the separate power-law exponent.",
       "grade": "C",
-      "source": "Reviewed-model placeholder pending event order-book data",
+      "source": "Commodity-simulation placeholder pending event order-book data",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.00025, 0.00409]
@@ -56,7 +56,7 @@
       "unit": "power-law exponent",
       "definition": "Shape assumption mapping capacity utilization to average round-trip slippage; one is linear in utilization and total slippage cost is then quadratic in notional.",
       "grade": "C",
-      "source": "Reviewed-model sensitivity convention pending event order-book depth",
+      "source": "Commodity-simulation sensitivity convention pending event order-book depth",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.5, 2.0]
@@ -66,7 +66,7 @@
       "unit": "signed rate of executable notional over 49 hours",
       "definition": "Positive values are attacker payments and negative values are attacker receipts.",
       "grade": "C",
-      "source": "Reviewed-model placeholder pending venue funding history",
+      "source": "Commodity-simulation placeholder pending venue funding history",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [-0.005, 0.005]
@@ -76,7 +76,7 @@
       "unit": "annual rate",
       "definition": "Opportunity cost applied to allocated margin over the fixed holding-horizon assumption.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.0, 0.15]
@@ -88,7 +88,7 @@
       "unit": "USD",
       "definition": "Requested borrow amount, capped by the historical listing-package debt ceiling.",
       "grade": "C",
-      "source": "Reviewed-model stress convention",
+      "source": "Commodity-simulation stress convention",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [100000, 3000000]
@@ -98,7 +98,7 @@
       "unit": "rate of collateral oracle value",
       "definition": "One-way acquisition fee excluding size-dependent market impact.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.0001, 0.005]
@@ -108,7 +108,7 @@
       "unit": "rate of borrowed amount over 49 hours",
       "definition": "Interest accrued before the modelled strategic default.",
       "grade": "C",
-      "source": "Reviewed-model placeholder pending reserve-level rate history",
+      "source": "Commodity-simulation placeholder pending reserve-level rate history",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.0, 0.003]
@@ -118,7 +118,7 @@
       "unit": "USD",
       "definition": "Fixed execution overhead for acquisition, deposit, and borrow.",
       "grade": "C",
-      "source": "Reviewed-model scenario assumption",
+      "source": "Commodity-simulation scenario assumption",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [100, 10000]
@@ -128,7 +128,7 @@
       "unit": "power-law exponent",
       "definition": "Shape assumption mapping trade size to average execution price impact around the observed reference quantity.",
       "grade": "C",
-      "source": "Reviewed-model sensitivity convention; the full order-book curve was not supplied",
+      "source": "Commodity-simulation sensitivity convention; the full order-book curve was not supplied",
       "as_of": "2026-08-15",
       "label": "assumption",
       "sensitivity": [0.5, 2.0]

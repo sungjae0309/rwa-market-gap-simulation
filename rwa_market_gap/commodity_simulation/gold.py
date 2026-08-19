@@ -4,9 +4,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, replace
 
-from rwa_market_gap.commodity_oracle.evidence import VerifiedInputLedger
-
 from .common import EconomicLedger, UnsupportedModel, finite, non_negative, rate
+from .evidence import VerifiedInputLedger
 from .execution import PowerLawAverageImpactCurve
 
 

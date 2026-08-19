@@ -24,6 +24,7 @@ htmlcov/
 *.pem
 *.key
 *.local.md
+local_only/
 
 # IDE and OS metadata
 .vscode/
