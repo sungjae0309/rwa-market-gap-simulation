@@ -1,4 +1,4 @@
-"""Generate three scoped PNG figures for the reviewed commodity scenario."""
+"""Generate English and Korean PNG figures for the commodity scenario."""
 
 from __future__ import annotations
 
@@ -57,11 +57,34 @@ def _font(size: int, *, bold: bool = False):
     return ImageFont.load_default()
 
 
+def _korean_font(size: int):
+    candidates = (
+        "/System/Library/Fonts/AppleSDGothicNeo.ttc",
+        "/System/Library/Fonts/Supplemental/AppleGothic.ttf",
+        "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+        "/usr/share/fonts/truetype/noto/NotoSansKR-Regular.ttf",
+    )
+    for candidate in candidates:
+        try:
+            return ImageFont.truetype(candidate, size=size)
+        except OSError:
+            continue
+    raise RuntimeError(
+        "A Korean font is required to generate the _ko figures. "
+        "Install Noto Sans KR or add a supported font path."
+    )
+
+
 TITLE_FONT = _font(42, bold=True)
 SUBTITLE_FONT = _font(24)
 LABEL_FONT = _font(24)
 SMALL_FONT = _font(20)
 LEGEND_FONT = _font(22)
+KOREAN_TITLE_FONT = _korean_font(42)
+KOREAN_SUBTITLE_FONT = _korean_font(24)
+KOREAN_LABEL_FONT = _korean_font(24)
+KOREAN_SMALL_FONT = _korean_font(20)
+KOREAN_LEGEND_FONT = _korean_font(22)
 
 
 class PlotCanvas:
@@ -76,6 +99,7 @@ class PlotCanvas:
         x_max: float,
         y_min: float,
         y_max: float,
+        korean: bool = False,
     ) -> None:
         self.image = Image.new("RGB", (WIDTH, HEIGHT), BACKGROUND)
         self.draw = ImageDraw.Draw(self.image)
@@ -87,25 +111,39 @@ class PlotCanvas:
         self.x_max = x_max
         self.y_min = y_min
         self.y_max = y_max
-        self.draw.text((70, 50), title, fill=FOREGROUND, font=TITLE_FONT)
-        self.draw.text((72, 110), subtitle, fill=MUTED, font=SUBTITLE_FONT)
+        if korean:
+            self.title_font = KOREAN_TITLE_FONT
+            self.subtitle_font = KOREAN_SUBTITLE_FONT
+            self.label_font = KOREAN_LABEL_FONT
+            self.small_font = KOREAN_SMALL_FONT
+            self.legend_font = KOREAN_LEGEND_FONT
+        else:
+            self.title_font = TITLE_FONT
+            self.subtitle_font = SUBTITLE_FONT
+            self.label_font = LABEL_FONT
+            self.small_font = SMALL_FONT
+            self.legend_font = LEGEND_FONT
+        self.draw.text((70, 50), title, fill=FOREGROUND, font=self.title_font)
+        self.draw.text(
+            (72, 110), subtitle, fill=MUTED, font=self.subtitle_font
+        )
         self.draw.text(
             ((self.left + self.right) / 2, HEIGHT - 72),
             x_label,
             fill=FOREGROUND,
-            font=LABEL_FONT,
+            font=self.label_font,
             anchor="mm",
         )
         self._rotated_y_label(y_label)
 
     def _rotated_y_label(self, label: str) -> None:
-        bounds = self.draw.textbbox((0, 0), label, font=LABEL_FONT)
+        bounds = self.draw.textbbox((0, 0), label, font=self.label_font)
         width = bounds[2] - bounds[0]
         height = bounds[3] - bounds[1]
         layer = Image.new("RGBA", (width + 24, height + 24), (0, 0, 0, 0))
         layer_draw = ImageDraw.Draw(layer)
         layer_draw.text(
-            (12, 12), label, fill=FOREGROUND, font=LABEL_FONT
+            (12, 12), label, fill=FOREGROUND, font=self.label_font
         )
         rotated = layer.rotate(90, expand=True)
         self.image.paste(
@@ -144,7 +182,7 @@ class PlotCanvas:
                 (self.left - 20, pixel),
                 y_format(value),
                 fill=MUTED,
-                font=SMALL_FONT,
+                font=self.small_font,
                 anchor="rm",
             )
         for value in x_ticks:
@@ -158,7 +196,7 @@ class PlotCanvas:
                 (pixel, self.bottom + 20),
                 x_format(value),
                 fill=MUTED,
-                font=SMALL_FONT,
+                font=self.small_font,
                 anchor="ma",
             )
         self.draw.line(
@@ -203,10 +241,10 @@ class PlotCanvas:
         x = self.left
         y = 167
         for label, color in entries:
-            width = self.draw.textlength(label, font=LEGEND_FONT)
+            width = self.draw.textlength(label, font=self.legend_font)
             self.draw.line((x, y + 14, x + 38, y + 14), fill=color, width=6)
             self.draw.text(
-                (x + 48, y), label, fill=FOREGROUND, font=LEGEND_FONT
+                (x + 48, y), label, fill=FOREGROUND, font=self.legend_font
             )
             x += width + 92
 
@@ -243,21 +281,41 @@ def _padded_domain(values: list[float], *, zero: bool = False) -> tuple[float, f
     return low - span * 0.10, high + span * 0.10
 
 
-def draw_wti_funding(data: WTIFundingChartData, destination: Path) -> None:
+def draw_wti_funding(
+    data: WTIFundingChartData,
+    destination: Path,
+    *,
+    korean: bool = False,
+) -> None:
     y_values = [point.y for series in data.series for point in series.points]
     y_min, y_max = _padded_domain(y_values, zero=True)
-    canvas = PlotCanvas(
-        title="WTI: Net Profit vs 49h Funding",
-        subtitle=(
+    title = (
+        "WTI: 펀딩비에 따른 순이익"
+        if korean
+        else "WTI: Net Profit vs 49h Funding"
+    )
+    subtitle = (
+        "관측된 두 주말 사례를 같은 가정으로 계산한 결과 · 성공확률 아님"
+        if korean
+        else (
             "Post-event conditional strategy; diagnostic range beyond the "
             "declared funding sensitivity"
+        )
+    )
+    canvas = PlotCanvas(
+        title=title,
+        subtitle=subtitle,
+        x_label=(
+            "49시간 누적 펀딩비"
+            if korean
+            else "49-hour cumulative funding paid"
         ),
-        x_label="49-hour cumulative funding paid",
-        y_label="Net profit (USD)",
+        y_label="순이익(달러)" if korean else "Net profit (USD)",
         x_min=data.x_min,
         x_max=data.x_max,
         y_min=y_min,
         y_max=y_max,
+        korean=korean,
     )
     sensitivity_left = canvas.x(data.declared_sensitivity_low)
     sensitivity_right = canvas.x(data.declared_sensitivity_high)
@@ -286,42 +344,75 @@ def draw_wti_funding(data: WTIFundingChartData, destination: Path) -> None:
         )
         canvas.draw.text(
             (pixel[0], pixel[1] - 22 - index * 32),
-            f"BE {break_even:.3%}",
+            (
+                f"손익분기 {break_even:.3%}"
+                if korean
+                else f"BE {break_even:.3%}"
+            ),
             fill=FOREGROUND,
-            font=SMALL_FONT,
+            font=canvas.small_font,
             anchor="ms",
         )
     canvas.legend(
         (
-            (data.series[0].label, BLUE),
-            (data.series[1].label, ORANGE),
-            ("Assumed funding 0.050%", GREEN),
+            ("1차 주말" if korean else data.series[0].label, BLUE),
+            ("2차 주말" if korean else data.series[1].label, ORANGE),
+            (
+                "기본 펀딩비 0.050%"
+                if korean
+                else "Assumed funding 0.050%",
+                GREEN,
+            ),
         )
     )
     canvas.draw.text(
         (canvas.left + 12, canvas.top + 12),
-        "Declared sensitivity: -0.5% to 0.5%",
+        (
+            "기본 민감도 범위: -0.5%~0.5%"
+            if korean
+            else "Declared sensitivity: -0.5% to 0.5%"
+        ),
         fill=MUTED,
-        font=SMALL_FONT,
+        font=canvas.small_font,
     )
     canvas.save(destination)
 
 
-def draw_gold_discount(data: GoldDiscountChartData, destination: Path) -> None:
+def draw_gold_discount(
+    data: GoldDiscountChartData,
+    destination: Path,
+    *,
+    korean: bool = False,
+) -> None:
     y_values = [point.y for series in data.series for point in series.points]
     y_min, y_max = _padded_domain(y_values, zero=True)
-    canvas = PlotCanvas(
-        title="Tokenized Gold: Net Profit vs Assumed Acquisition Discount",
-        subtitle=(
+    title = (
+        "토큰화 금: 매입 할인 가정에 따른 순이익"
+        if korean
+        else "Tokenized Gold: Net Profit vs Assumed Acquisition Discount"
+    )
+    subtitle = (
+        "4.5%는 실제 할인이 아니라 관측된 최대 가격 차이를 할인으로 가정한 값"
+        if korean
+        else (
             "4.5% is the maximum observed token-metal divergence, applied as "
             "an attacker-favorable discount assumption"
+        )
+    )
+    canvas = PlotCanvas(
+        title=title,
+        subtitle=subtitle,
+        x_label=(
+            "가정한 매입 할인율"
+            if korean
+            else "Assumed acquisition discount"
         ),
-        x_label="Assumed acquisition discount",
-        y_label="Net profit (USD)",
+        y_label="순이익(달러)" if korean else "Net profit (USD)",
         x_min=data.x_min,
         x_max=data.x_max,
         y_min=y_min,
         y_max=y_max,
+        korean=korean,
     )
     canvas.axes(
         x_ticks=_ticks(data.x_min, data.x_max, 8),
@@ -339,9 +430,13 @@ def draw_gold_discount(data: GoldDiscountChartData, destination: Path) -> None:
             canvas.x(data.tested_divergence_as_discount) + 12,
             canvas.top + 12,
         ),
-        "4.5% divergence used as discount",
+        (
+            "가격 차이 4.5%를 할인으로 가정"
+            if korean
+            else "4.5% divergence used as discount"
+        ),
         fill=FOREGROUND,
-        font=SMALL_FONT,
+        font=canvas.small_font,
     )
     for index, break_even in enumerate(data.break_even_discounts):
         pixel = (canvas.x(break_even), canvas.y(0.0))
@@ -351,33 +446,56 @@ def draw_gold_discount(data: GoldDiscountChartData, destination: Path) -> None:
         )
         canvas.draw.text(
             (pixel[0], pixel[1] - 18 - index * 30),
-            f"BE {break_even:.2%}",
+            (
+                f"손익분기 {break_even:.2%}"
+                if korean
+                else f"BE {break_even:.2%}"
+            ),
             fill=FOREGROUND,
-            font=SMALL_FONT,
+            font=canvas.small_font,
             anchor="ms",
         )
-    canvas.legend(
-        tuple((series.label, color) for series, color in zip(data.series, colors))
-    )
+    if korean:
+        legend_labels = ("가격 영향 완만", "가격 영향 기본", "가격 영향 가파름")
+        canvas.legend(tuple(zip(legend_labels, colors)))
+    else:
+        canvas.legend(
+            tuple(
+                (series.label, color)
+                for series, color in zip(data.series, colors)
+            )
+        )
     canvas.save(destination)
 
 
-def draw_leverage_bands(data: LeverageBandChartData, destination: Path) -> None:
+def draw_leverage_bands(
+    data: LeverageBandChartData,
+    destination: Path,
+    *,
+    korean: bool = False,
+) -> None:
     y_max = max(
         max(bar.liquidation_adverse_move for bar in data.bars),
         data.counterfactual_reanchor_cap_rate,
     ) * 1.16
     canvas = PlotCanvas(
-        title="WTI: Liquidation Move vs Price-Discovery Bounds",
-        subtitle=(
-            "Simplified base tier only; unpublished margin tiers are not modelled"
+        title=(
+            "WTI: 레버리지별 청산 가격 변화폭"
+            if korean
+            else "WTI: Liquidation Move vs Price-Discovery Bounds"
         ),
-        x_label="Selected leverage",
-        y_label="Adverse price move",
+        subtitle=(
+            "공개되지 않은 대형 포지션 구간은 제외하고 기본 구간만 계산"
+            if korean
+            else "Simplified base tier only; unpublished margin tiers are not modelled"
+        ),
+        x_label="선택 레버리지" if korean else "Selected leverage",
+        y_label="청산까지 필요한 가격 변화폭" if korean else "Adverse price move",
         x_min=0.0,
         x_max=float(len(data.bars)),
         y_min=0.0,
         y_max=y_max,
+        korean=korean,
     )
     x_centers = tuple(index + 0.5 for index in range(len(data.bars)))
     canvas.axes(
@@ -400,33 +518,46 @@ def draw_leverage_bands(data: LeverageBandChartData, destination: Path) -> None:
             ((left + right) / 2, top - 16),
             f"{bar.liquidation_adverse_move:.1%}",
             fill=FOREGROUND,
-            font=LABEL_FONT,
+            font=canvas.label_font,
             anchor="ms",
         )
     canvas.horizontal(data.static_band_rate, color=ORANGE, width=5)
     canvas.horizontal(data.counterfactual_reanchor_cap_rate, color=PURPLE, width=5)
     canvas.draw.text(
         (canvas.right - 8, canvas.y(data.static_band_rate) - 10),
-        f"Static band {data.static_band_rate:.1%}",
+        (
+            f"기존 가격 제한 {data.static_band_rate:.1%}"
+            if korean
+            else f"Static band {data.static_band_rate:.1%}"
+        ),
         fill=FOREGROUND,
-        font=SMALL_FONT,
+        font=canvas.small_font,
         anchor="rs",
     )
     canvas.draw.text(
         (canvas.right - 8, canvas.y(data.counterfactual_reanchor_cap_rate) - 10),
         (
-            "Counterfactual reanchor cap "
-            f"{data.counterfactual_reanchor_cap_rate:.2%}"
+            f"가격 기준 재설정 상한 {data.counterfactual_reanchor_cap_rate:.2%} (당시 미적용)"
+            if korean
+            else (
+                "Counterfactual reanchor cap "
+                f"{data.counterfactual_reanchor_cap_rate:.2%}"
+            )
         ),
         fill=FOREGROUND,
-        font=SMALL_FONT,
+        font=canvas.small_font,
         anchor="rs",
     )
     canvas.legend(
         (
-            ("Liquidation move", BLUE),
-            ("Static band", ORANGE),
-            ("Counterfactual reanchor cap", PURPLE),
+            ("청산까지 필요한 변화폭" if korean else "Liquidation move", BLUE),
+            ("기존 가격 제한" if korean else "Static band", ORANGE),
+            (
+                "가격 기준 재설정 상한(당시 미적용)"
+                if korean
+                else "Counterfactual reanchor cap",
+                PURPLE,
+            ),
         )
     )
     canvas.save(destination)
@@ -442,14 +573,26 @@ def main() -> None:
     args = parser.parse_args()
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
-    destinations = (
+    english_destinations = (
         args.output_dir / "wti_funding_break_even.png",
         args.output_dir / "gold_discount_break_even.png",
         args.output_dir / "wti_leverage_bounds.png",
     )
-    draw_wti_funding(build_wti_funding_chart_data(), destinations[0])
-    draw_gold_discount(build_gold_discount_chart_data(), destinations[1])
-    draw_leverage_bands(build_leverage_band_chart_data(), destinations[2])
+    korean_destinations = (
+        args.output_dir / "wti_funding_break_even_ko.png",
+        args.output_dir / "gold_discount_break_even_ko.png",
+        args.output_dir / "wti_leverage_bounds_ko.png",
+    )
+    funding_data = build_wti_funding_chart_data()
+    gold_data = build_gold_discount_chart_data()
+    leverage_data = build_leverage_band_chart_data()
+    draw_wti_funding(funding_data, english_destinations[0])
+    draw_gold_discount(gold_data, english_destinations[1])
+    draw_leverage_bands(leverage_data, english_destinations[2])
+    draw_wti_funding(funding_data, korean_destinations[0], korean=True)
+    draw_gold_discount(gold_data, korean_destinations[1], korean=True)
+    draw_leverage_bands(leverage_data, korean_destinations[2], korean=True)
+    destinations = english_destinations + korean_destinations
     for destination in destinations:
         print(destination)
 

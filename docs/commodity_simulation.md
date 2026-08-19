@@ -221,21 +221,23 @@ python3 -m scripts.plot_commodity_results
 
 ### WTI 펀딩 손익분기
 
-![WTI 펀딩 손익분기](../figures/commodity_simulation/wti_funding_break_even.png)
+![WTI 펀딩 손익분기](../figures/commodity_simulation/wti_funding_break_even_ko.png)
 
 49시간 누적 펀딩비가 각각 5.969%, 11.335%에 도달하면 두 사후 전략의 순이익이 0이 됩니다. 음영 구간은 선언된 펀딩 민감도 -0.5%~0.5%이며, 그 밖의 구간은 손익분기점을 보여주기 위한 진단적 연장입니다. 실제 사건 펀딩이 이 범위에 있었다는 뜻이 아닙니다.
 
 ### 토큰화 금 할인 가정 손익분기
 
-![토큰화 금 할인 가정 손익분기](../figures/commodity_simulation/gold_discount_break_even.png)
+![토큰화 금 할인 가정 손익분기](../figures/commodity_simulation/gold_discount_break_even_ko.png)
 
 4.5%는 검증된 매입 할인이 아니라 최대 관측 괴리입니다. 이 괴리 전체를 공격자에게 유리한 매입 할인으로 가정해도 세 충격 곡선 모두 손실이며, 손익분기 할인은 31.00%~32.86%입니다.
 
 ### WTI 레버리지별 청산 구간
 
-![WTI 레버리지별 청산 구간](../figures/commodity_simulation/wti_leverage_bounds.png)
+![WTI 레버리지별 청산 구간](../figures/commodity_simulation/wti_leverage_bounds_ko.png)
 
 공개된 마진 티어가 없어 기본 티어만 비교합니다. 20배 포지션의 청산 역행폭은 정적 밴드 안에 있고, 10배는 정적 밴드 밖이지만 반사실적 리앵커 캡 안에 있으며, 5배는 두 경계 밖에 있습니다.
+
+같은 그림의 영문판은 파일명에서 `_ko`를 뺀 PNG로 함께 보존합니다.
 
 ## 실행
 

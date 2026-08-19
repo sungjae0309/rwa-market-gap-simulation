@@ -8,7 +8,7 @@
 |---|---|
 | `data/commodity_simulation/` | 원자재 모델의 근거 수치와 가정값 |
 | `docs/` | 모델별 수식, 가정, 결과 해석 |
-| `figures/commodity_simulation/` | 노션·보고서용 원자재 결과 그래프 |
+| `figures/commodity_simulation/` | 노션·보고서용 원자재 결과 그래프 영문·한글판 |
 | `rwa_market_gap/` | 실제 계산 로직 |
 | `scripts/` | 시뮬레이션 실행 진입점 |
 | `tests/` | 수식, 경계조건, 결과 일관성 검증 |
