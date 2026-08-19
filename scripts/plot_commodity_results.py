@@ -355,8 +355,8 @@ def draw_wti_funding(
         )
     canvas.legend(
         (
-            ("1차 주말" if korean else data.series[0].label, BLUE),
-            ("2차 주말" if korean else data.series[1].label, ORANGE),
+            ("가격 공백 사례 1" if korean else data.series[0].label, BLUE),
+            ("가격 공백 사례 2" if korean else data.series[1].label, ORANGE),
             (
                 "기본 펀딩비 0.050%"
                 if korean
