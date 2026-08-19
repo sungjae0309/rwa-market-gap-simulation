@@ -4,11 +4,11 @@ import unittest
 from dataclasses import replace
 from statistics import fmean
 
-from weekend_gap_protocol_config import (
+from rwa_market_gap.weekend_gap.protocol_config import (
     DEFAULT_PROTOCOL_AWARE_WEEKEND_GAP_CONFIG,
     EvidenceConfig,
 )
-from weekend_gap_protocol_simulation import ProtocolAwareWeekendGapEngine
+from rwa_market_gap.weekend_gap.protocol import ProtocolAwareWeekendGapEngine
 
 
 def enabled_config():

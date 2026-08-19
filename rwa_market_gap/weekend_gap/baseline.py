@@ -10,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 from typing import Iterable
 
-from weekend_gap_config import WeekendGapConfig
+from .config import WeekendGapConfig
 
 
 @dataclass(frozen=True)

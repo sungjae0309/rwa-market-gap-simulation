@@ -1,6 +1,6 @@
 """Protocol-aware Weekend Gap model kept separate from the draft baseline.
 
-The original ``weekend_gap_simulation.py`` faithfully reproduces the research
+The ``weekend_gap.baseline`` module faithfully reproduces the research
 draft's closed-form equations.  This module adds the checks that are needed
 before discussing a specific lending protocol:
 
@@ -21,7 +21,7 @@ from math import ceil, exp, isfinite
 from statistics import fmean
 from typing import Iterable
 
-from weekend_gap_protocol_config import (
+from .protocol_config import (
     DEFAULT_PROTOCOL_AWARE_WEEKEND_GAP_CONFIG,
     ProtocolAwareWeekendGapConfig,
 )

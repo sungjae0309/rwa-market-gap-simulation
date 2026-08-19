@@ -3,8 +3,7 @@ from __future__ import annotations
 import unittest
 from dataclasses import replace
 
-from weekend_gap_config import WeekendGapConfig
-from weekend_gap_simulation import WeekendGapEngine
+from rwa_market_gap.weekend_gap import WeekendGapConfig, WeekendGapEngine
 
 
 class WeekendGapThresholdTests(unittest.TestCase):

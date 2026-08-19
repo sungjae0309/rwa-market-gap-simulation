@@ -1,17 +1,17 @@
 # Protocol-aware Weekend Gap 모델
 
-이 모델은 기존 `weekend_gap_simulation.py`를 교체하지 않는다. 기존 파일은 연구 초안의 수식을 재현하는 결정론적 기준선이고, 새 모델은 실제 프로토콜에 적용하기 전에 확인해야 할 조건을 별도 입력으로 분리한다.
+이 모델은 `rwa_market_gap/weekend_gap/baseline.py`를 교체하지 않는다. 기존 파일은 연구 초안의 수식을 재현하는 결정론적 기준선이고, 새 모델은 실제 프로토콜에 적용하기 전에 확인해야 할 조건을 별도 입력으로 분리한다.
 
 ## 새 파일
 
-- `weekend_gap_protocol_config.py`: 오라클 정책, 준비금 상태, 캡, 금리곡선, 부분청산, 유동성 및 근거 상태
-- `weekend_gap_protocol_simulation.py`: 대출 가능 여부, 부분청산 경로, 전략적 디폴트, 부실채권 및 갭 표본 기대값
-- `tests/test_weekend_gap_protocol_simulation.py`: 신규 모델의 경계조건 테스트
+- `rwa_market_gap/weekend_gap/protocol_config.py`: 오라클 정책, 준비금 상태, 캡, 금리곡선, 부분청산, 유동성 및 근거 상태
+- `rwa_market_gap/weekend_gap/protocol.py`: 대출 가능 여부, 부분청산 경로, 전략적 디폴트, 부실채권 및 갭 표본 기대값
+- `tests/weekend_gap/test_protocol.py`: 신규 모델의 경계조건 테스트
 
 ## 기본 실행
 
 ```bash
-python3 weekend_gap_protocol_simulation.py
+python3 -m scripts.run_weekend_gap
 ```
 
 기본값은 실제 프로토콜 스냅샷이 아니다. 따라서 전통시장이 닫혀 있고 가격이 오래된 상태의 신규 대출을 차단한다.
@@ -21,10 +21,10 @@ python3 weekend_gap_protocol_simulation.py
 ```python
 from dataclasses import replace
 
-from weekend_gap_protocol_config import (
+from rwa_market_gap.weekend_gap.protocol_config import (
     DEFAULT_PROTOCOL_AWARE_WEEKEND_GAP_CONFIG,
 )
-from weekend_gap_protocol_simulation import ProtocolAwareWeekendGapEngine
+from rwa_market_gap.weekend_gap.protocol import ProtocolAwareWeekendGapEngine
 
 base = DEFAULT_PROTOCOL_AWARE_WEEKEND_GAP_CONFIG
 config = replace(
