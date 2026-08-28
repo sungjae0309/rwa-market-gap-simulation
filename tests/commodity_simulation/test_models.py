@@ -292,6 +292,61 @@ class CommodityGoldTests(unittest.TestCase):
         assert isinstance(result, GoldFalsificationResult)
         self.assertIsNone(result.success_probability)
 
+    def test_published_ltv_remains_the_default(self) -> None:
+        result = self.gold.analyze()
+        assert isinstance(result, GoldFalsificationResult)
+        self.assertAlmostEqual(result.tested_max_ltv, 0.70)
+        self.assertFalse(result.max_ltv_is_counterfactual)
+        self.assertIn("governance.aave.com", result.max_ltv_source)
+
+    def test_counterfactual_ltv_is_labelled_and_does_not_replace_default(self) -> None:
+        counterfactual = self.gold.analyze(max_ltv=0.86)
+        baseline = self.gold.analyze()
+        assert isinstance(counterfactual, GoldFalsificationResult)
+        assert isinstance(baseline, GoldFalsificationResult)
+        self.assertTrue(counterfactual.max_ltv_is_counterfactual)
+        self.assertAlmostEqual(counterfactual.tested_max_ltv, 0.86)
+        self.assertAlmostEqual(baseline.tested_max_ltv, 0.70)
+        self.assertFalse(counterfactual.profitable_at_tested_discount)
+        self.assertGreater(
+            counterfactual.modelled_break_even_discount,
+            counterfactual.tested_discount_assumption,
+        )
+
+    def test_observed_divergence_requires_near_total_ltv_to_break_even(self) -> None:
+        discount = 0.045
+        minimum_ltv = self.gold.minimum_ltv_for_discount(discount)
+        self.assertIsNotNone(minimum_ltv)
+        assert minimum_ltv is not None
+        self.assertGreater(minimum_ltv, 0.97)
+        self.assertLess(minimum_ltv, 0.98)
+        at_break_even = self.gold.analyze(
+            token_discount=discount,
+            max_ltv=minimum_ltv,
+        )
+        assert isinstance(at_break_even, GoldFalsificationResult)
+        self.assertAlmostEqual(
+            at_break_even.ledger.net_profit_usd,
+            0.0,
+            delta=0.01,
+        )
+
+    def test_invalid_counterfactual_ltv_is_rejected(self) -> None:
+        for invalid_ltv in (0.0, 1.01):
+            with self.subTest(max_ltv=invalid_ltv):
+                with self.assertRaises(ValueError):
+                    self.gold.analyze(max_ltv=invalid_ltv)
+
+    def test_paxg_comparison_is_not_mislabeled_as_xaut_ltv(self) -> None:
+        engine = CommoditySimulationEngine()
+        comparison = engine.evidence.record(
+            "gold_collateral_comparisons."
+            "paxg_aave_v4_proposed_collateral_factor"
+        )
+        self.assertAlmostEqual(float(comparison.value), 0.75)
+        self.assertIn("different token", comparison.definition)
+        self.assertIn("proposed", comparison.definition.lower())
+
 
 class CommodityNaturalGasTests(unittest.TestCase):
     def setUp(self) -> None:

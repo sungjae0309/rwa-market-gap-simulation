@@ -5,8 +5,10 @@ from __future__ import annotations
 import unittest
 
 from rwa_market_gap.commodity_simulation import CommoditySimulationEngine
+from rwa_market_gap.commodity_simulation.gold import GoldFalsificationResult
 from rwa_market_gap.commodity_simulation.visualization import (
     build_gold_discount_chart_data,
+    build_gold_ltv_sensitivity_chart_data,
     build_leverage_band_chart_data,
     build_wti_funding_chart_data,
 )
@@ -64,6 +66,53 @@ class GoldDiscountChartTests(unittest.TestCase):
                     0.0,
                 )
         self.assertIn("discount assumption", self.chart.assumption_note)
+
+
+class GoldLTVSensitivityChartTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.engine = CommoditySimulationEngine()
+        self.chart = build_gold_ltv_sensitivity_chart_data(self.engine)
+
+    def test_baseline_and_external_proposal_are_separate_landmarks(self) -> None:
+        self.assertAlmostEqual(self.chart.official_xaut_max_ltv, 0.70)
+        self.assertAlmostEqual(
+            self.chart.proposed_paxg_collateral_factor,
+            0.75,
+        )
+        self.assertIn("different token", self.chart.comparison_note)
+        counterfactual = self.engine.evidence.record(
+            "analysis.gold_counterfactual_max_ltv"
+        )
+        self.assertEqual(counterfactual.grade, "C")
+        self.assertEqual(counterfactual.label, "assumption")
+        self.assertEqual(counterfactual.sensitivity, (0.8, 0.9))
+        self.assertAlmostEqual(
+            self.chart.counterfactual_comparison_ltv,
+            float(counterfactual.value),
+        )
+
+    def test_higher_ltv_reduces_the_required_discount(self) -> None:
+        at_70 = _point_at(
+            self.chart.break_even_series,
+            self.chart.official_xaut_max_ltv,
+        )
+        at_86 = _point_at(
+            self.chart.break_even_series,
+            self.chart.counterfactual_comparison_ltv,
+        )
+        self.assertGreater(at_70.y, at_86.y)
+        self.assertGreater(at_86.y, self.chart.tested_divergence_as_discount)
+
+    def test_reported_minimum_ltv_really_zeroes_net_profit(self) -> None:
+        minimum = self.chart.minimum_ltv_at_tested_divergence
+        self.assertIsNotNone(minimum)
+        assert minimum is not None
+        result = self.engine.build().gold.analyze(
+            token_discount=self.chart.tested_divergence_as_discount,
+            max_ltv=minimum,
+        )
+        assert isinstance(result, GoldFalsificationResult)
+        self.assertAlmostEqual(result.ledger.net_profit_usd, 0.0, delta=0.01)
 
 
 class LeverageBandChartTests(unittest.TestCase):

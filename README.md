@@ -35,7 +35,7 @@
 - 테스트: `tests/commodity_simulation/`
 - 실행: `python3 -m scripts.run_commodity_simulation`
 - 민감도: `python3 -m scripts.run_commodity_sensitivity`
-- 그래프: `python3 -m scripts.plot_commodity_results` 영문·한국어 PNG 각 3개 생성
+- 그래프: `python3 -m scripts.plot_commodity_results` 영문·한국어 PNG 각 4개 생성
 - 문서: [원자재 시뮬레이션](docs/commodity_simulation.md)
 
 두 모델 간 import 없는 독립 패키지
@@ -48,9 +48,9 @@
 python3 -m unittest discover -s tests -v
 ```
 
-전체 테스트 99개 / 원자재 시나리오 전용 테스트 72개
+전체 테스트 107개 / 원자재 시나리오 전용 테스트 80개
 
-원자재 전용 72개 구성: 공시 파라미터 메커니즘 33개 / 비용·수익 계산 33개 / 시각화 수치 6개
+원자재 전용 80개 구성: 공시 파라미터 메커니즘 33개 / 비용·수익 계산 38개 / 시각화 수치 9개
 
 테스트 범위: 입력 수식과 경계조건의 코드 내 일관성 확인
 

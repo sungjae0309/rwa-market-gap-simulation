@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "ledger_as_of": "2026-08-14",
+  "ledger_as_of": "2026-08-29",
   "mechanics": {
     "reanchor_trigger_fraction": {
       "value": 0.9,
@@ -41,8 +41,8 @@
       "unit": "hours",
       "definition": "Standard external-session closure from Friday 17:00 ET to Sunday 18:00 ET, excluding holidays.",
       "grade": "A",
-      "source": "Published commodity market session specification",
-      "as_of": "2026-08-14"
+      "source": "https://www.cmegroup.com/education/courses/introduction-to-energy/introduction-to-crude-oil/wti-overview",
+      "as_of": "2026-08-29"
     }
   },
   "markets": {
@@ -449,7 +449,7 @@
       "unit": "rate",
       "definition": "Collateral maximum loan-to-value ratio in the listing snapshot.",
       "grade": "A",
-      "source": "Tokenized-gold collateral listing governance proposal",
+      "source": "https://governance.aave.com/t/arfc-add-xaut-to-aave-v3-core-instance/22385",
       "as_of": "2025-08-25"
     },
     "liquidation_threshold": {
@@ -549,7 +549,27 @@
       "as_of": "2025-08-25"
     }
   },
+  "gold_collateral_comparisons": {
+    "paxg_aave_v4_proposed_collateral_factor": {
+      "value": 0.75,
+      "unit": "rate",
+      "definition": "Proposed PAXG collateral factor in the Aave V4 Gold Spoke. This is a different token and protocol version, so it is used only as an external comparison and never substituted for the XAUt Aave V3 max LTV.",
+      "grade": "A",
+      "source": "https://governance.aave.com/t/arfc-onboard-paxg-to-the-global-dollar-hub-in-aave-v4-ethereum/25340/4",
+      "as_of": "2026-08-19"
+    }
+  },
   "analysis": {
+    "gold_counterfactual_max_ltv": {
+      "value": 0.86,
+      "unit": "rate",
+      "definition": "High-LTV counterfactual used to test whether the tokenized-gold conclusion survives a less conservative collateral setting. It is not an observed or recommended gold-market parameter.",
+      "grade": "C",
+      "source": "Commodity-simulation deterministic comparison",
+      "as_of": "2026-08-29",
+      "label": "assumption",
+      "sensitivity": [0.8, 0.9]
+    },
     "loss_transfer_notional_usd": {
       "value": 20000000,
       "unit": "USD notional",

@@ -184,6 +184,43 @@ def main() -> None:
         "a conservative proxy for buy-side acquisition cost"
     )
     print("success_probability=None (stale state is a condition, not a distribution)")
+    print("Gold max-LTV comparison (deterministic, not a probability)")
+    published_ltv = float(engine.evidence.value("gold_collateral.max_ltv"))
+    proposed_comparison_ltv = float(
+        engine.evidence.value(
+            "gold_collateral_comparisons."
+            "paxg_aave_v4_proposed_collateral_factor"
+        )
+    )
+    tested_divergence = float(
+        engine.evidence.value(
+            "gold_collateral.observed_max_token_metal_divergence"
+        )
+    )
+    counterfactual_ltv = float(
+        engine.evidence.value("analysis.gold_counterfactual_max_ltv")
+    )
+    for label, ltv in (
+        ("published XAUt baseline", published_ltv),
+        ("different-token PAXG proposal comparison", proposed_comparison_ltv),
+        ("counterfactual comparison", counterfactual_ltv),
+    ):
+        result = suite.gold.analyze(max_ltv=ltv)
+        if not isinstance(result, GoldFalsificationResult):
+            raise AssertionError("stale-oracle state should be executable")
+        print(
+            f"  {label}: LTV={ltv:.0%}, "
+            f"break-even discount={result.modelled_break_even_discount:.2%}, "
+            f"net at tested {tested_divergence:.1%}="
+            f"{usd(result.ledger.net_profit_usd)}"
+        )
+    required_ltv = suite.gold.minimum_ltv_for_discount(tested_divergence)
+    print(
+        f"  minimum LTV for the {tested_divergence:.1%} discount assumption "
+        f"to break even={required_ltv:.2%}"
+        if required_ltv is not None
+        else "  no break-even LTV"
+    )
     print()
 
     gas = suite.natural_gas.analyze()

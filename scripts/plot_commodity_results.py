@@ -15,10 +15,12 @@ except ImportError as exc:  # pragma: no cover - exercised only without Pillow
 
 from rwa_market_gap.commodity_simulation.visualization import (
     GoldDiscountChartData,
+    GoldLTVSensitivityChartData,
     LeverageBandChartData,
     LineSeries,
     WTIFundingChartData,
     build_gold_discount_chart_data,
+    build_gold_ltv_sensitivity_chart_data,
     build_leverage_band_chart_data,
     build_wti_funding_chart_data,
 )
@@ -461,6 +463,110 @@ def draw_gold_discount(
     canvas.save(destination)
 
 
+def draw_gold_ltv_sensitivity(
+    data: GoldLTVSensitivityChartData,
+    destination: Path,
+    *,
+    korean: bool = False,
+) -> None:
+    canvas = PlotCanvas(
+        title=(
+            "토큰화 금: LTV별 필요한 매입 할인"
+            if korean
+            else "Tokenized Gold: Required Discount by Max LTV"
+        ),
+        subtitle=(
+            f"70%는 XAUt 기준값 · 75%는 다른 금 토큰의 제안 비교값 · "
+            f"{data.counterfactual_comparison_ltv:.0%}는 가상 비교"
+            if korean
+            else (
+                "70% XAUt baseline; 75% different-token proposal; "
+                f"{data.counterfactual_comparison_ltv:.0%} "
+                "counterfactual comparison"
+            )
+        ),
+        x_label="최대 LTV" if korean else "Maximum LTV",
+        y_label=(
+            "손익분기에 필요한 매입 할인율"
+            if korean
+            else "Acquisition discount required to break even"
+        ),
+        x_min=data.x_min,
+        x_max=data.x_max,
+        y_min=0.0,
+        y_max=0.40,
+        korean=korean,
+    )
+    canvas.axes(
+        x_ticks=(0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 0.99),
+        y_ticks=(0.0, 0.05, 0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40),
+        x_format=_percentage,
+        y_format=_percentage,
+    )
+    canvas.line_series(data.break_even_series, color=GREEN)
+    canvas.horizontal(data.tested_divergence_as_discount, color=RED, width=4)
+    canvas.dashed_vertical(data.official_xaut_max_ltv, color=BLUE)
+    canvas.dashed_vertical(data.proposed_paxg_collateral_factor, color=ORANGE)
+    canvas.dashed_vertical(data.counterfactual_comparison_ltv, color=PURPLE)
+    canvas.draw.text(
+        (canvas.left + 12, canvas.y(data.tested_divergence_as_discount) + 12),
+        (
+            "관측 괴리 4.5%를 할인으로 가정"
+            if korean
+            else "Observed 4.5% divergence used as discount"
+        ),
+        fill=FOREGROUND,
+        font=canvas.small_font,
+        anchor="la",
+    )
+    if data.minimum_ltv_at_tested_divergence is not None:
+        root_x = canvas.x(data.minimum_ltv_at_tested_divergence)
+        root_y = canvas.y(data.tested_divergence_as_discount)
+        canvas.draw.ellipse(
+            (root_x - 9, root_y - 9, root_x + 9, root_y + 9),
+            fill=RED,
+        )
+        canvas.draw.text(
+            (root_x - 8, root_y - 30),
+            (
+                f"4.5%로 손익분기하려면 LTV 약 "
+                f"{data.minimum_ltv_at_tested_divergence:.2%}"
+                if korean
+                else (
+                    "LTV required for 4.5% break-even: "
+                    f"{data.minimum_ltv_at_tested_divergence:.2%}"
+                )
+            ),
+            fill=FOREGROUND,
+            font=canvas.small_font,
+            anchor="rs",
+        )
+    canvas.legend(
+        (
+            ("필요 할인율" if korean else "Required discount", GREEN),
+            ("XAUt 기준 70%" if korean else "XAUt baseline 70%", BLUE),
+            (
+                "PAXG 제안 비교 75%"
+                if korean
+                else "PAXG proposal comparison 75%",
+                ORANGE,
+            ),
+            (
+                (
+                    f"가상 비교 {data.counterfactual_comparison_ltv:.0%}"
+                    if korean
+                    else (
+                        "Counterfactual "
+                        f"{data.counterfactual_comparison_ltv:.0%}"
+                    )
+                ),
+                PURPLE,
+            ),
+        )
+    )
+    canvas.save(destination)
+
+
 def draw_leverage_bands(
     data: LeverageBandChartData,
     destination: Path,
@@ -567,21 +673,28 @@ def main() -> None:
         args.output_dir / "wti_funding_break_even.png",
         args.output_dir / "gold_discount_break_even.png",
         args.output_dir / "wti_leverage_bounds.png",
+        args.output_dir / "gold_ltv_sensitivity.png",
     )
     korean_destinations = (
         args.output_dir / "wti_funding_break_even_ko.png",
         args.output_dir / "gold_discount_break_even_ko.png",
         args.output_dir / "wti_leverage_bounds_ko.png",
+        args.output_dir / "gold_ltv_sensitivity_ko.png",
     )
     funding_data = build_wti_funding_chart_data()
     gold_data = build_gold_discount_chart_data()
     leverage_data = build_leverage_band_chart_data()
+    gold_ltv_data = build_gold_ltv_sensitivity_chart_data()
     draw_wti_funding(funding_data, english_destinations[0])
     draw_gold_discount(gold_data, english_destinations[1])
     draw_leverage_bands(leverage_data, english_destinations[2])
+    draw_gold_ltv_sensitivity(gold_ltv_data, english_destinations[3])
     draw_wti_funding(funding_data, korean_destinations[0], korean=True)
     draw_gold_discount(gold_data, korean_destinations[1], korean=True)
     draw_leverage_bands(leverage_data, korean_destinations[2], korean=True)
+    draw_gold_ltv_sensitivity(
+        gold_ltv_data, korean_destinations[3], korean=True
+    )
     destinations = english_destinations + korean_destinations
     for destination in destinations:
         print(destination)

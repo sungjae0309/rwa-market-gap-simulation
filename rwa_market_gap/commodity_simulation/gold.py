@@ -51,6 +51,9 @@ class GoldStressAssumptions:
 @dataclass(frozen=True)
 class GoldFalsificationResult:
     snapshot_label: str
+    tested_max_ltv: float
+    max_ltv_source: str
+    max_ltv_is_counterfactual: bool
     borrowed_usd: float
     collateral_oracle_value_usd: float
     collateral_tokens: float
@@ -94,6 +97,7 @@ class GoldFalsificationEconomics:
         self,
         *,
         token_discount: float | None = None,
+        max_ltv: float | None = None,
         stale_oracle_available: bool = True,
     ) -> GoldFalsificationResult | UnsupportedModel:
         if not stale_oracle_available:
@@ -109,7 +113,15 @@ class GoldFalsificationEconomics:
                 ),
             )
         prefix = "gold_collateral"
-        ltv = float(self.evidence.value(f"{prefix}.max_ltv"))
+        published_ltv = float(self.evidence.value(f"{prefix}.max_ltv"))
+        ltv = published_ltv if max_ltv is None else rate(max_ltv, "max_ltv")
+        if ltv <= 0.0:
+            raise ValueError("max_ltv must be positive")
+        max_ltv_source = (
+            self.evidence.record(f"{prefix}.max_ltv").source
+            if max_ltv is None
+            else "caller-supplied counterfactual max-LTV comparison"
+        )
         debt_cap = float(self.evidence.value(f"{prefix}.debt_cap_usd"))
         uses_observed_divergence = token_discount is None
         tested_discount = float(
@@ -178,6 +190,9 @@ class GoldFalsificationEconomics:
                 "historical listing-package analysis: June 2025 liquidity and "
                 "August 2025 proposed risk parameters; not current state"
             ),
+            tested_max_ltv=ltv,
+            max_ltv_source=max_ltv_source,
+            max_ltv_is_counterfactual=max_ltv is not None,
             borrowed_usd=borrowed,
             collateral_oracle_value_usd=collateral_face,
             collateral_tokens=collateral_tokens,
@@ -205,3 +220,44 @@ class GoldFalsificationEconomics:
             ledger=ledger,
             profitable_at_tested_discount=ledger.profitable,
         )
+
+    def minimum_ltv_for_discount(
+        self,
+        token_discount: float,
+        *,
+        tolerance: float = 1e-10,
+        max_iterations: int = 200,
+    ) -> float | None:
+        """Return the max LTV where the supplied discount first breaks even.
+
+        This is a deterministic threshold, not a recommended risk parameter.
+        It keeps every other model input fixed and varies only max LTV. ``None``
+        means that even an LTV arbitrarily close to 100% does not break even.
+        """
+
+        discount = rate(token_discount, "token_discount")
+        if tolerance <= 0.0:
+            raise ValueError("tolerance must be positive")
+        if max_iterations <= 0:
+            raise ValueError("max_iterations must be positive")
+
+        low = 1e-9
+        high = 1.0 - 1e-9
+        high_result = self.analyze(token_discount=discount, max_ltv=high)
+        if not isinstance(high_result, GoldFalsificationResult):
+            raise AssertionError("the supplied stale state should be executable")
+        if high_result.ledger.net_profit_usd < 0.0:
+            return None
+
+        for _ in range(max_iterations):
+            midpoint = (low + high) / 2.0
+            result = self.analyze(token_discount=discount, max_ltv=midpoint)
+            if not isinstance(result, GoldFalsificationResult):
+                raise AssertionError("the supplied stale state should be executable")
+            if result.ledger.net_profit_usd >= 0.0:
+                high = midpoint
+            else:
+                low = midpoint
+            if high - low <= tolerance:
+                break
+        return high

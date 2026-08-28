@@ -42,6 +42,21 @@ class GoldDiscountChartData:
 
 
 @dataclass(frozen=True)
+class GoldLTVSensitivityChartData:
+    """The discount required to break even at each max-LTV setting."""
+
+    break_even_series: LineSeries
+    official_xaut_max_ltv: float
+    proposed_paxg_collateral_factor: float
+    counterfactual_comparison_ltv: float
+    tested_divergence_as_discount: float
+    minimum_ltv_at_tested_divergence: float | None
+    x_min: float
+    x_max: float
+    comparison_note: str
+
+
+@dataclass(frozen=True)
 class LeverageBar:
     leverage: float
     liquidation_adverse_move: float
@@ -170,6 +185,82 @@ def build_gold_discount_chart_data(
         x_min=x_min,
         x_max=x_max,
         assumption_note=baseline_results[0].tested_discount_source,
+    )
+
+
+def build_gold_ltv_sensitivity_chart_data(
+    engine: CommoditySimulationEngine | None = None,
+    *,
+    samples: int = 141,
+    counterfactual_comparison_ltv: float | None = None,
+) -> GoldLTVSensitivityChartData:
+    """Break-even acquisition discount across a deterministic max-LTV sweep.
+
+    XAUt's published 70% max LTV remains the baseline. The PAXG value is an
+    external proposal for a different token and protocol version, while 86% is
+    deliberately labelled as a counterfactual comparison. None is treated as
+    a distribution or an attack-success probability.
+    """
+
+    resolved_engine = engine or CommoditySimulationEngine()
+    resolved_counterfactual_ltv = float(
+        resolved_engine.evidence.value("analysis.gold_counterfactual_max_ltv")
+        if counterfactual_comparison_ltv is None
+        else counterfactual_comparison_ltv
+    )
+    if not 0.0 < resolved_counterfactual_ltv < 1.0:
+        raise ValueError("counterfactual_comparison_ltv must be between 0 and 1")
+    gold = resolved_engine.build().gold
+    official_ltv = float(
+        resolved_engine.evidence.value("gold_collateral.max_ltv")
+    )
+    proposal_record = resolved_engine.evidence.record(
+        "gold_collateral_comparisons.paxg_aave_v4_proposed_collateral_factor"
+    )
+    proposal_ltv = float(proposal_record.value)
+    tested_divergence = float(
+        resolved_engine.evidence.value(
+            "gold_collateral.observed_max_token_metal_divergence"
+        )
+    )
+    minimum_ltv = gold.minimum_ltv_for_discount(tested_divergence)
+    x_min = 0.65
+    x_max = 0.99
+    landmarks = (
+        official_ltv,
+        proposal_ltv,
+        resolved_counterfactual_ltv,
+    ) + (() if minimum_ltv is None else (minimum_ltv,))
+    x_values = _with_landmarks(
+        _linspace(x_min, x_max, samples),
+        tuple(value for value in landmarks if x_min <= value <= x_max),
+    )
+    points: list[ChartPoint] = []
+    for ltv in x_values:
+        result = gold.analyze(max_ltv=ltv)
+        if not isinstance(result, GoldFalsificationResult):
+            raise AssertionError("the supplied stale state should be executable")
+        points.append(
+            ChartPoint(x=ltv, y=result.modelled_break_even_discount)
+        )
+    return GoldLTVSensitivityChartData(
+        break_even_series=LineSeries(
+            label="Required acquisition discount",
+            points=tuple(points),
+        ),
+        official_xaut_max_ltv=official_ltv,
+        proposed_paxg_collateral_factor=proposal_ltv,
+        counterfactual_comparison_ltv=resolved_counterfactual_ltv,
+        tested_divergence_as_discount=tested_divergence,
+        minimum_ltv_at_tested_divergence=minimum_ltv,
+        x_min=x_min,
+        x_max=x_max,
+        comparison_note=(
+            "PAXG 75% is an Aave V4 proposal for a different token; "
+            f"{resolved_counterfactual_ltv:.0%} is a "
+            "counterfactual comparison, not a recommended gold parameter. "
+            f"Source: {proposal_record.source}"
+        ),
     )
 
 
