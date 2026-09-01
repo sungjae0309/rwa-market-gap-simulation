@@ -6,7 +6,8 @@ published venue parameters, with no cost assumption and no attacker model:
 * the band identity ``band_rate == 1 / max_leverage``;
 * the reanchor state machine and the hard cap it implies;
 * the maintenance-margin and liquidation-trigger arithmetic that decides which
-  leverage bands the discovery bound actually protects.
+  leverage bands the discovery bound actually protects;
+* the collateral scope implied by cross and isolated margin.
 
 These are the strongest claims in the scenario because every input is grade-A
 published data, so they are kept separate from the assumption-driven WTI, gold,
@@ -59,13 +60,18 @@ def liquidation_adverse_move(
     )
 
 
-def loss_path(margin_mode: MarginMode) -> tuple[str, ...]:
-    """Documented order of loss absorption; the stages are not simulated."""
+def liquidation_collateral_scope(margin_mode: MarginMode) -> tuple[str, ...]:
+    """Collateral exposed to liquidation under the published margin mode.
+
+    Margin mode determines the scope of collateral, not whether a backstop or
+    ADL stage was available or used in a particular event. Those later stages
+    require event-specific evidence and are intentionally not inferred here.
+    """
 
     if margin_mode == "cross":
-        return ("market_liquidation", "backstop_liquidator", "adl")
+        return ("cross_positions", "cross_margin_balance")
     if margin_mode == "isolated":
-        return ("market_liquidation", "adl")
+        return ("isolated_position", "isolated_margin_balance")
     raise ValueError(f"unsupported margin mode: {margin_mode}")
 
 
@@ -120,12 +126,8 @@ class MarketSpec:
         return self.upward_hard_cap_rate / self.bankruptcy_move_at_max_leverage
 
     @property
-    def has_backstop_liquidator(self) -> bool:
-        return self.margin_mode == "cross"
-
-    @property
-    def documented_loss_path(self) -> tuple[str, ...]:
-        return loss_path(self.margin_mode)
+    def liquidation_collateral_scope(self) -> tuple[str, ...]:
+        return liquidation_collateral_scope(self.margin_mode)
 
     @classmethod
     def from_ledger(cls, ledger: VerifiedInputLedger, symbol: str) -> "MarketSpec":

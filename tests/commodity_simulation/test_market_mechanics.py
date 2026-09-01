@@ -15,8 +15,8 @@ from rwa_market_gap.commodity_simulation.market_mechanics import (
     MarketSpec,
     band_identity_report,
     leverage_zone,
+    liquidation_collateral_scope,
     liquidation_adverse_move,
-    loss_path,
     machine_for_market,
     maintenance_margin_rate,
     market_specs,
@@ -251,23 +251,32 @@ class LeverageZoneTests(unittest.TestCase):
         self.assertFalse(zone.margin_tiers_modelled)
 
 
-class LossPathTests(unittest.TestCase):
-    def test_cross_margin_has_a_backstop_stage(self) -> None:
+class MarginScopeTests(unittest.TestCase):
+    def test_cross_margin_exposes_the_shared_cross_scope(self) -> None:
         self.assertEqual(
-            loss_path("cross"),
-            ("market_liquidation", "backstop_liquidator", "adl"),
+            liquidation_collateral_scope("cross"),
+            ("cross_positions", "cross_margin_balance"),
         )
 
-    def test_isolated_margin_loses_the_backstop_stage(self) -> None:
-        self.assertEqual(loss_path("isolated"), ("market_liquidation", "adl"))
+    def test_isolated_margin_limits_the_collateral_scope(self) -> None:
+        self.assertEqual(
+            liquidation_collateral_scope("isolated"),
+            ("isolated_position", "isolated_margin_balance"),
+        )
 
     def test_natural_gas_is_the_isolated_market(self) -> None:
         engine = CommoditySimulationEngine()
         specs = {spec.symbol: spec for spec in market_specs(engine.evidence)}
-        self.assertFalse(specs["NATGAS"].has_backstop_liquidator)
+        self.assertEqual(
+            specs["NATGAS"].liquidation_collateral_scope,
+            ("isolated_position", "isolated_margin_balance"),
+        )
         for symbol in ("GOLD", "WTIOIL", "SILVER", "BRENTOIL"):
             with self.subTest(market=symbol):
-                self.assertTrue(specs[symbol].has_backstop_liquidator)
+                self.assertEqual(
+                    specs[symbol].liquidation_collateral_scope,
+                    ("cross_positions", "cross_margin_balance"),
+                )
 
 
 class HormuzGoldenCaseTests(unittest.TestCase):
@@ -294,6 +303,16 @@ class HormuzGoldenCaseTests(unittest.TestCase):
         self.reopen = float(
             self.engine.evidence.value(
                 "events.wti_second_weekend.cme_reopen_price_usd"
+            )
+        )
+        self.short_liquidations = float(
+            self.engine.evidence.value(
+                "events.wti_second_weekend.short_liquidations_usd"
+            )
+        )
+        self.long_liquidations = float(
+            self.engine.evidence.value(
+                "events.wti_second_weekend.long_liquidations_usd"
             )
         )
         wti_spec = {spec.symbol: spec for spec in self.engine.market_specs()}[
@@ -335,6 +354,19 @@ class HormuzGoldenCaseTests(unittest.TestCase):
                     "events.wti_second_weekend.reanchor_active_during_event"
                 )
             )
+        )
+
+    def test_external_reopen_recognition_gap_is_12_10_percentage_points(self) -> None:
+        recognition_gap = (self.reopen - self.observed_mark) / self.cme_close
+        self.assertAlmostEqual(recognition_gap, 0.121040, places=6)
+
+    def test_liquidation_imbalance_is_observed_context_not_attack_profit(self) -> None:
+        self.assertEqual(self.short_liquidations, 36_900_000.0)
+        self.assertEqual(self.long_liquidations, 2_100_000.0)
+        self.assertAlmostEqual(
+            self.short_liquidations / self.long_liquidations,
+            17.5714285714,
+            places=8,
         )
 
 

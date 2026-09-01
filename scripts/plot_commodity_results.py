@@ -471,7 +471,7 @@ def draw_gold_ltv_sensitivity(
 ) -> None:
     canvas = PlotCanvas(
         title=(
-            "토큰화 금: LTV별 필요한 매입 할인"
+            "토큰화 금: LTV별 필요한 가격 차이"
             if korean
             else "Tokenized Gold: Required Discount by Max LTV"
         ),
@@ -487,7 +487,7 @@ def draw_gold_ltv_sensitivity(
         ),
         x_label="최대 LTV" if korean else "Maximum LTV",
         y_label=(
-            "손익분기에 필요한 매입 할인율"
+            "손익분기에 필요한 가격 차이"
             if korean
             else "Acquisition discount required to break even"
         ),
@@ -511,7 +511,7 @@ def draw_gold_ltv_sensitivity(
     canvas.draw.text(
         (canvas.left + 12, canvas.y(data.tested_divergence_as_discount) + 12),
         (
-            "관측 괴리 4.5%를 할인으로 가정"
+            "확인된 가격 차이 4.5%"
             if korean
             else "Observed 4.5% divergence used as discount"
         ),
@@ -543,7 +543,7 @@ def draw_gold_ltv_sensitivity(
         )
     canvas.legend(
         (
-            ("필요 할인율" if korean else "Required discount", GREEN),
+            ("필요 가격 차이" if korean else "Required discount", GREEN),
             ("XAUt 기준 70%" if korean else "XAUt baseline 70%", BLUE),
             (
                 "PAXG 제안 비교 75%"

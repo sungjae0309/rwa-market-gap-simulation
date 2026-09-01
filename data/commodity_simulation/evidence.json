@@ -82,7 +82,7 @@
       "margin_mode": {
         "value": "cross",
         "unit": "category",
-        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "definition": "Published margin mode controlling the collateral and position scope affected by liquidation; it does not by itself establish whether a backstop liquidator is available.",
         "grade": "A",
         "source": "trade.xyz specification index and liquidation documentation",
         "as_of": "2026-08-14"
@@ -132,7 +132,7 @@
       "margin_mode": {
         "value": "cross",
         "unit": "category",
-        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "definition": "Published margin mode controlling the collateral and position scope affected by liquidation; it does not by itself establish whether a backstop liquidator is available.",
         "grade": "A",
         "source": "trade.xyz specification index and liquidation documentation",
         "as_of": "2026-08-14"
@@ -182,7 +182,7 @@
       "margin_mode": {
         "value": "isolated",
         "unit": "category",
-        "definition": "Normal isolated margin; the cross-margin backstop liquidator does not apply.",
+        "definition": "Normal isolated margin; liquidation is scoped to the isolated position and its assigned margin. Backstop and ADL execution for the supplied event remain unverified.",
         "grade": "A",
         "source": "trade.xyz specification index and liquidation documentation",
         "as_of": "2026-08-14"
@@ -232,7 +232,7 @@
       "margin_mode": {
         "value": "cross",
         "unit": "category",
-        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "definition": "Published margin mode controlling the collateral and position scope affected by liquidation; it does not by itself establish whether a backstop liquidator is available.",
         "grade": "A",
         "source": "trade.xyz specification index and liquidation documentation",
         "as_of": "2026-08-14"
@@ -282,7 +282,7 @@
       "margin_mode": {
         "value": "cross",
         "unit": "category",
-        "definition": "Margin mode controlling whether the backstop liquidator is available.",
+        "definition": "Published margin mode controlling the collateral and position scope affected by liquidation; it does not by itself establish whether a backstop liquidator is available.",
         "grade": "A",
         "source": "trade.xyz specification index and liquidation documentation",
         "as_of": "2026-08-14"

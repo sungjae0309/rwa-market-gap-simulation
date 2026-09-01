@@ -75,6 +75,12 @@ def print_hormuz_golden_case(engine: CommoditySimulationEngine) -> None:
             "is verified as the static upper bound"
         )
     reopen = float(engine.evidence.value(f"{prefix}.cme_reopen_price_usd"))
+    short_liquidations = float(
+        engine.evidence.value(f"{prefix}.short_liquidations_usd")
+    )
+    long_liquidations = float(
+        engine.evidence.value(f"{prefix}.long_liquidations_usd")
+    )
     wti_spec = {spec.symbol: spec for spec in engine.market_specs()}["WTIOIL"]
     implied_venue_reference = observed_mark / (1.0 + wti_spec.band_rate)
     static = machine_for_market(
@@ -100,6 +106,20 @@ def print_hormuz_golden_case(engine: CommoditySimulationEngine) -> None:
     print(
         f"  external reopen={reopen:.2f} exceeds the reanchored ceiling: "
         f"{reopen > reanchored_cap}"
+    )
+    recognition_gap_pp = (reopen - observed_mark) / cme_close
+    print(
+        "  return gap on the common Friday-close base="
+        f"{recognition_gap_pp:.3%}p"
+    )
+    print(
+        f"  observed 24h liquidations: shorts={usd(short_liquidations)}, "
+        f"longs={usd(long_liquidations)}, "
+        f"short/long={short_liquidations / long_liquidations:.1f}x"
+    )
+    print(
+        "  context only: these observations do not establish strategy fills, "
+        "attack profit, funding failure, or ADL"
     )
     print()
 
