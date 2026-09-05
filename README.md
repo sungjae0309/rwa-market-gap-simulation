@@ -1,5 +1,55 @@
 # RWA Market Gap Simulation
 
+PoS 체인이 정상적으로 작동하더라도 온체인이 참조하는 가격과 실제 시장
+위험이 어긋날 때 경제적 손실이 남는지를 검증하는 Python 연구 모델입니다.
+
+이 저장소는 실제 공격을 실행하거나 성공확률을 예측하는 프로그램이 아닙니다.
+공식값·관측값·가정값을 분리하고, 선언한 조건에서 비용·수익·손익분기점을
+재현하는 것이 목적입니다.
+
+## 처음 보는 사람을 위한 실행 순서
+
+Python 3.10 이상에서 저장소 최상위 경로를 기준으로 실행합니다.
+
+```bash
+# 1. 원자재 기본 결과
+python3 -m scripts.run_commodity_simulation
+
+# 2. 원자재 가정값 민감도
+python3 -m scripts.run_commodity_sensitivity
+
+# 3. 전체 테스트
+python3 -m unittest discover -s tests -v
+```
+
+그래프를 다시 만들 때만 Pillow가 필요합니다.
+
+```bash
+python3 -m pip install -r requirements-visualization.txt
+python3 -m scripts.plot_commodity_results
+```
+
+## 저장소에 포함된 모델
+
+| 모델 | 포함 범위 | 포함하지 않는 것 |
+|---|---|---|
+| 원자재 시뮬레이션 | WTI 조건부 사후 경제성, 토큰화 금 반증 테스트, 천연가스 벤치마크 불일치 | 실제 체결 재현, 임의 공격 성공확률, 미확인 ADL·백스톱 손실 |
+| 주식 주말 가격 공백 | 토큰화 주식 담보의 주말 갭 기준선과 프로토콜 조건 점검 | 최신 PBS·오라클 갱신 검열 시나리오와 현수님 S1·S2 수익 모델 |
+
+따라서 이 저장소는 원자재 전용은 아니지만, 현재 가장 상세하게 정리된 공개
+모델은 원자재 시뮬레이션입니다. `weekend_gap`은 별도의 초기 주식 담보 모델이며
+현수님의 최신 `주식 Lending Oracle` 모델과 동일한 구현이 아닙니다.
+
+## 원자재 모델 읽는 순서
+
+1. [`docs/commodity_simulation.md`](docs/commodity_simulation.md): 검증 질문·수식·결과·한계
+2. [`data/commodity_simulation/evidence.json`](data/commodity_simulation/evidence.json): 공식값과 관측값
+3. [`data/commodity_simulation/assumptions.json`](data/commodity_simulation/assumptions.json): 연구상 가정값
+4. [`rwa_market_gap/commodity_simulation/`](rwa_market_gap/commodity_simulation/): 계산 로직
+5. [`tests/commodity_simulation/`](tests/commodity_simulation/): 수식과 경계조건 검증
+
+입력값으로 계산한 순이익과 손익분기점은 실측값이 아니라 모델 결과입니다.
+
 ## 폴더 설명 
 
 | 항목 | 역할 |
@@ -15,11 +65,14 @@
 
 `data` = 입력 / `rwa_market_gap` = 계산 / `scripts` = 실행 / `tests` = 검증
 
-## 모델
+## 모델 상세
 
-### 통합 공격 시나리오
+### 주식 주말 가격 공백(초기 모델)
 
 토큰화 주식 담보의 주말 가격 공백, 신규 차입, 청산과 전략적 디폴트 분석
+
+이 모델은 현수님의 최신 PBS·오라클 갱신 검열 S1·S2 모델이 아니라, 연구
+초기에 작성한 주말 가격 공백 기준선과 프로토콜 조건 점검 모델입니다.
 
 - 코드: `rwa_market_gap/weekend_gap/`
 - 테스트: `tests/weekend_gap/`
@@ -55,12 +108,3 @@ python3 -m unittest discover -s tests -v
 원자재 전용 82개 구성: 공시 파라미터 메커니즘 35개 / 비용·수익 계산 38개 / 시각화 수치 9개
 
 테스트 범위: 입력 수식과 경계조건의 코드 내 일관성 확인
-
-## 그래프 생성
-
-그래프 생성에만 Pillow 필요
-
-```bash
-python3 -m pip install -r requirements-visualization.txt
-python3 -m scripts.plot_commodity_results
-```

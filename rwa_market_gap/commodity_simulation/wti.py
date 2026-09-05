@@ -12,17 +12,19 @@ from .execution import CapacityResult, apply_capacity
 
 @dataclass(frozen=True)
 class WTIStressAssumptions:
-    requested_notional_usd: float
-    assumed_capacity_usd: float
-    allocated_margin_usd: float
+    """Declared WTI strategy inputs; capacity and costs are not observed fills."""
+
+    requested_notional_usd: float  # Position size requested by the strategy.
+    assumed_capacity_usd: float  # Unverified executable-notional ceiling.
+    allocated_margin_usd: float  # Capital allocated as margin, not full account equity.
     round_trip_fee_rate: float
-    round_trip_slippage_rate: float
-    slippage_exponent: float
+    round_trip_slippage_rate: float  # Slippage at the capacity reference point.
+    slippage_exponent: float  # Curvature of size-dependent slippage.
     signed_funding_rate_over_horizon: float
     funding_sensitivity_low: float
     funding_sensitivity_high: float
     capital_annual_rate: float
-    horizon_hours: float
+    horizon_hours: float  # Holding window; 49 hours for the standard CME weekend.
 
     def __post_init__(self) -> None:
         non_negative(self.requested_notional_usd, "requested_notional_usd")
@@ -193,6 +195,7 @@ class WTIStressEconomics:
                 ),
                 required_evidence=("a separate entry-direction rule",),
             )
+        # Follow the observed onchain mark direction relative to the Friday close.
         direction = 1.0 if mark > close else -1.0
         direction_name = "long" if direction > 0.0 else "short"
         signed_recognition_gap = (reopen - mark) / close
