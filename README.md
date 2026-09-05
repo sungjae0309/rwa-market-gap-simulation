@@ -1,15 +1,14 @@
-# RWA Market Gap Simulation
+# Simulation
 
 PoS 체인이 정상적으로 작동하더라도 온체인이 참조하는 가격과 실제 시장
-위험이 어긋날 때 경제적 손실이 남는지를 검증하는 Python 연구 모델입니다.
+위험이 어긋날 때 경제적 손실이 남는지를 검증하는 Python 모델 
 
-이 저장소는 실제 공격을 실행하거나 성공확률을 예측하는 프로그램이 아닙니다.
 공식값·관측값·가정값을 분리하고, 선언한 조건에서 비용·수익·손익분기점을
 재현하는 것이 목적입니다.
 
-## 처음 보는 사람을 위한 실행 순서
+## 실행 순서
 
-Python 3.10 이상에서 저장소 최상위 경로를 기준으로 실행합니다.
+Python 3.10 이상에서 저장소 최상위 경로를 기준으로 실행
 
 ```bash
 # 1. 원자재 기본 결과
@@ -22,7 +21,7 @@ python3 -m scripts.run_commodity_sensitivity
 python3 -m unittest discover -s tests -v
 ```
 
-그래프를 다시 만들 때만 Pillow가 필요합니다.
+그래프를 다시 만들 때만 Pillow가 필요
 
 ```bash
 python3 -m pip install -r requirements-visualization.txt
@@ -40,7 +39,7 @@ python3 -m scripts.plot_commodity_results
 모델은 원자재 시뮬레이션입니다. `weekend_gap`은 별도의 초기 주식 담보 모델이며
 현수님의 최신 `주식 Lending Oracle` 모델과 동일한 구현이 아닙니다.
 
-## 원자재 모델 읽는 순서
+## 원자재 읽는 순서
 
 1. [`docs/commodity_simulation.md`](docs/commodity_simulation.md): 검증 질문·수식·결과·한계
 2. [`data/commodity_simulation/evidence.json`](data/commodity_simulation/evidence.json): 공식값과 관측값
@@ -48,7 +47,7 @@ python3 -m scripts.plot_commodity_results
 4. [`rwa_market_gap/commodity_simulation/`](rwa_market_gap/commodity_simulation/): 계산 로직
 5. [`tests/commodity_simulation/`](tests/commodity_simulation/): 수식과 경계조건 검증
 
-입력값으로 계산한 순이익과 손익분기점은 실측값이 아니라 모델 결과입니다.
+입력값으로 계산한 순이익과 손익분기점은 실측값이 아니라 모델 결과
 
 ## 폴더 설명 
 
@@ -71,8 +70,8 @@ python3 -m scripts.plot_commodity_results
 
 토큰화 주식 담보의 주말 가격 공백, 신규 차입, 청산과 전략적 디폴트 분석
 
-이 모델은 현수님의 최신 PBS·오라클 갱신 검열 S1·S2 모델이 아니라, 연구
-초기에 작성한 주말 가격 공백 기준선과 프로토콜 조건 점검 모델입니다.
+이 모델은 최신 PBS·오라클 갱신 검열 S1·S2 모델이 아니라, 
+초기에 작성한 주말 가격 공백 기준선과 프로토콜 조건 점검 모델
 
 - 코드: `rwa_market_gap/weekend_gap/`
 - 테스트: `tests/weekend_gap/`
